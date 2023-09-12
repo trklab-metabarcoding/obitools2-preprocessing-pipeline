@@ -1,0 +1,18 @@
+---
+title: "Step 2a - data preparation"
+author: "T. Divoll"
+date: "2023-09-12"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Environment Setup
+
+This notebook can be used to run the OBITools 3 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs or select Run All from the dropdown above to run the whole pipeline. First, update the parameters in the first code chunk.
