@@ -20,7 +20,7 @@ This notebook can be used to run the OBITools 3 pipeline and serve as a tutorial
 
 ```{r include=FALSE}
 install.packages("pacman")
-pacman::p_load(here, tidyverse, readxl, Biostrings)
+pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
 ```
 
 #### Update parameters and thresholds
@@ -58,18 +58,17 @@ sequencing_date <- as.list(unique(sample_sheet$`seq date`))
 
 #### Rename files with project-specific sample names
 ```{r}
-file_names_original <- list.files(samples_dir, pattern=".gz", full.names = T) 
+file_names <- list.files(samples_dir, pattern=".gz", full.names = T) 
 ```
 
 ```{r}
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
-#df2 <- sapply(df, function(i){paste0(here("data/"),i)})
-#mapply(FUN = file.rename, from = 
+file_names <- stringr::str_replace_all(file_names, setNames(df$field_name, df$lab_name))
 ```
 
 ```{r}
-y
+file_names_original
 ```
 
