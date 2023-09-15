@@ -20,7 +20,7 @@ This notebook can be used to run the OBITools 3 pipeline and serve as a tutorial
 
 ```{r include=FALSE}
 install.packages("pacman")
-pacman::p_load(here, Biostrings)
+pacman::p_load(here, tidyverse, readxl, Biostrings)
 ```
 
 #### Update parameters and thresholds
@@ -38,12 +38,38 @@ R_primer <- DNAString("CCATTGAGTCTCTGCACCTATC")
 ```{r}
 samples_dir <- here("data")
 output_dir <- here("results")
-sample_file_list <- list.files(samples_dir, full.names=T, pattern="xlsx")
+batch_file_list <- list.files(samples_dir, full.names=T, pattern="xlsx")
+sample_sheet <- read_xlsx(here("data/sample_sheet_test.xlsx"), col_types = "guess")
+sample_sheet_metadata <- read_xlsx(here("data/sample_sheet_test_metadata.xlsx"), col_types = "guess")
+Sys.setenv(samples_dir=samples_dir)
 ```
 
 #### Generate some additional parameters from inputs
 ```{r}
 reverseComplement(F_primer)
 reverseComplement(R_primer)
+```
+The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
+```{r}
+extraction_date <- as.list(unique(sample_sheet$`Ext date`))
+pcr_date <- as.list(unique(sample_sheet$`PCR date`))
+sequencing_date <- as.list(unique(sample_sheet$`seq date`))
+```
+
+#### Rename files with project-specific sample names
+```{r}
+file_names_original <- list.files(samples_dir, pattern=".gz", full.names = T) 
+```
+
+```{r}
+lab_name <- sample_sheet$SampleName
+field_name <- sample_sheet$SampleID
+df <- data.frame(field_name, lab_name)
+#df2 <- sapply(df, function(i){paste0(here("data/"),i)})
+#mapply(FUN = file.rename, from = 
+```
+
+```{r}
+y
 ```
 
