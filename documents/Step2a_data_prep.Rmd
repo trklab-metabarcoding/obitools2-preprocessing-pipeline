@@ -27,27 +27,50 @@ pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
 ```{r}
 cutadapt_mismatch <- 2 # -e in cutadapt
 min_read_count <- 1000
-min_read_length <- # -l in obigrep
-max_read_length <- # -L in obigrep
+min_read_length <- 8 # -l in obigrep
+max_read_length <- 300 # -L in obigrep
 clean_threshold <- 0.05 # -r in obiclean
+matching_score <- 40 # --score-min in illuminapairedend
 F_primer <- DNAString("GGGCAATCCTGAGCCAA")
 R_primer <- DNAString("CCATTGAGTCTCTGCACCTATC")
+
+## make environment variables that can be passed to bash code chunks
+Sys.setenv(cutadapt_mismatch = cutadapt_mismatch)
+Sys.setenv(min_read_count = min_read_count)
+Sys.setenv(min_read_length = min_read_length)
+Sys.setenv(max_read_length = max_read_length)
+Sys.setenv(clean_threshold = clean_threshold)
+Sys.setenv(matching_score = matching_score)
+Sys.setenv(F_primer = F_primer)
+Sys.setenv(R_primer = R_primer)
 ```
 
 #### Set up standard path variables
 ```{r}
-samples_dir <- here("data")
-output_dir <- here("results")
+samples_path <- here("data")
+output_path <- here("results")
+merged_path <- here("results/merged")
 batch_file_list <- list.files(samples_dir, full.names=T, pattern="xlsx")
 sample_sheet <- read_xlsx(here("data/sample_sheet_test.xlsx"), col_types = "guess")
 sample_sheet_metadata <- read_xlsx(here("data/sample_sheet_test_metadata.xlsx"), col_types = "guess")
-Sys.setenv(samples_dir=samples_dir)
+
+## make environment variables that can be passed to bash code chunks
+Sys.setenv(samples_dir=samples_path)
+Sys.setenv(output_dir=output_path)
+Sys.setenv(merged_dir=merged_path)
 ```
 
 #### Generate some additional parameters from inputs
 ```{r}
-reverseComplement(F_primer)
-reverseComplement(R_primer)
+F_primer_reverse <- reverseComplement(F_primer)
+R_primer_reverse <- reverseComplement(R_primer)
+F_primer_reverse 
+R_primer_reverse
+
+## ## make environment variables that can be passed to bash code chunks
+
+Sys.setenv(F_primer_reverse = F_primer_reverse)
+Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```
 The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
 ```{r}
@@ -73,10 +96,13 @@ file.rename(file_names_original, file_names)
 This section will strip off the primers and send the "stdout" to a file so we can keep track of what was removed for each sample.
 ```{r}
 sampleNames <- as.list(field_name)
+Sys.setenv(sampleNames = "sampleNames")
 ```
 
 **NOTE** At this point, the code chunks switch over from R to Bash
 ```{bash}
+cd output_dir
+
 for sample in $(cat sampleNames)
 do
 
@@ -89,5 +115,55 @@ done
 Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect ~95%+ of reads to be retained and ~50-70% of bps. 
 ```{bash}
 paste sampleNames <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
+```
+
+#### Merge Illumina forward and reverse reads
+```{bash}
+#Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
+
+for sample in $(cat sampleNames)
+do
+    echo "On sample: $sample"
+    
+    illuminapairedend --score-min=$matching_score \
+    -r ${sample}_R2_001_trimmed.fastq.gz \
+    ${sample}_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
+    
+    echo obicount ${sample}_merged.fastq
+done
+
+```
+
+#### Filter out unaligned reads
+```{bash}
+for sample in $(cat sampleNames)
+do
+
+    echo "On sample: $sample"
+    
+    obigrep -p 'mode!="joined"' ${sample}_merged.fastq > ${sample}_ali.fastq
+done
+```
+
+#### Add sample names to each file
+```{bash}
+for sample in $(cat sampleNames)
+do
+
+    echo "On sample: $sample"
+    
+  obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
+
+done
+
+mv *_id.fastq $merged_dir
+```
+
+#### Combine remaining sequences into one FASTA and dereplicate
+```{bash}
+cd $merged_dir
+
+obiuniq -m sample *_id.fastq > all.uniq.fasta
+echo obicount all.uniq.fasta
 ```
 
