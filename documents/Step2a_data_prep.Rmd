@@ -11,26 +11,29 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
-here::i_am("documents/Step2a_data_prep.Rmd")
 ```
 
 ## Environment Setup
 
-This notebook can be used to run the OBITools 3 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs or select Run All from the dropdown above to run the whole pipeline. First, update the parameters in the first code chunk.
+This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs. First, update the parameters in the first few code chunks.
 
 ```{r include=FALSE}
-#install.packages("pacman")
+#install.packages("pacman") # if then
 pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
+here::i_am("documents/Step2a_data_prep.Rmd")
 ```
 
 #### Update parameters and thresholds
 ```{r}
-cutadapt_mismatch <- 2 # -e in cutadapt
+# OBITools parameters
 min_read_count <- 1000
 min_read_length <- 8 # -l in obigrep
 max_read_length <- 300 # -L in obigrep
 clean_threshold <- 0.05 # -r in obiclean
 matching_score <- 40 # --score-min in illuminapairedend
+
+# Cutadapt parameters
+cutadapt_mismatch <- 2 # -e in cutadapt
 F_primer <- DNAString("GGGCAATCCTGAGCCAA")
 R_primer <- DNAString("CCATTGAGTCTCTGCACCTATC")
 
@@ -47,12 +50,15 @@ Sys.setenv(R_primer = R_primer)
 
 #### Set up standard path variables
 ```{r}
-samples_path <- here("data")
-output_path <- here("results")
-merged_path <- here("results/merged")
-batch_file_list <- list.files(samples_dir, full.names=T, pattern="xlsx")
+today <- Sys.Date()
+dir.create(here(today))
+samples_path <- file.path(here(today,"data"))
+output_path <- file.path(here(today, "results"))
+merged_path <- file.path(here(today, "results/merged"))
 sample_sheet <- read_xlsx(here("data/sample_sheet_test.xlsx"), col_types = "guess")
-sample_sheet_metadata <- read_xlsx(here("data/sample_sheet_test_metadata.xlsx"), col_types = "guess")
+dir.create(samples_path)
+dir.create(output_path)
+dir.create(merged_path)
 
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(samples_dir=samples_path)
@@ -88,18 +94,25 @@ lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
 file_names <- stringr::str_replace_all(file_names_original, setNames(df$field_name, df$lab_name))
-file_names <- stringr::str_replace(file_names, "_S\\d+_L001", "")
 file.rename(file_names_original, file_names)
 ```
 
-#### Trim primers with cutadapt
-This section will strip off the primers and send the "stdout" to a file so we can keep track of what was removed for each sample.
 ```{r}
 sampleNames <- as.list(field_name)
 Sys.setenv(sampleNames = "sampleNames")
 ```
 
+#### Trim primers with Cutadapt
+This section will strip off the primers and send the "stdout" to a file so we can keep track of what was removed for each sample.
+
 **NOTE** At this point, the code chunks switch over from R to Bash
+```{bash}
+# installing cutadapt - create environment to install into
+conda create -n cutadaptenv
+conda activate cutadaptenv
+conda install -c bioconda cutadapt
+```
+
 ```{bash}
 cd output_dir
 
@@ -107,8 +120,8 @@ for sample in $(cat sampleNames)
 do
 
     echo "On sample: $sample"
-    
-    cutadapt -a ^GGGCAATCCTGAGCCAA...GATAGGTGCAGAGACTCAATGG -A ^CCATTGAGTCTCTGCACCTATC...TTGGCTCAGGATTGCCC --no-indels -e $cutadapt_mismatch --discard-untrimmed -o ${sample}_R1_001_trimmed.fastq.gz -p ${sample}_R2_001_trimmed.fastq.gz ${sample}_R1_001.fastq.gz ${sample}_R2_001.fastq.gz >> cutadapt_primer_trimming_stats.txt 2>&1
+  
+    cutadapt -a ^$F_primer...$R_primer_reverse -A ^$R_primer...$R_primer_reverse --no-indels -e $cutadapt_mismatch --discard-untrimmed -o ${sample}_S[0-9]+_L001_R1_001_trimmed.fastq.gz -p ${sample}_S[0-9]+_L001_R2_001_trimmed.fastq.gz ${sample}_S[0-9]+_L001_R1_001.fastq.gz ${sample}_S[0-9]+_L001_R2_001.fastq.gz >> cutadapt_primer_trimming_stats.txt 2>&1
 done
 ```
 
@@ -117,53 +130,10 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 paste sampleNames <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
 ```
 
-#### Merge Illumina forward and reverse reads
+Deactivate the conda environment that uses Python 3 for Cutadapt
 ```{bash}
-#Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
-
-for sample in $(cat sampleNames)
-do
-    echo "On sample: $sample"
-    
-    illuminapairedend --score-min=$matching_score \
-    -r ${sample}_R2_001_trimmed.fastq.gz \
-    ${sample}_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
-    
-    echo obicount ${sample}_merged.fastq
-done
-
+conda deactivate
 ```
 
-#### Filter out unaligned reads
-```{bash}
-for sample in $(cat sampleNames)
-do
-
-    echo "On sample: $sample"
-    
-    obigrep -p 'mode!="joined"' ${sample}_merged.fastq > ${sample}_ali.fastq
-done
-```
-
-#### Add sample names to each file
-```{bash}
-for sample in $(cat sampleNames)
-do
-
-    echo "On sample: $sample"
-    
-  obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
-
-done
-
-mv *_id.fastq $merged_dir
-```
-
-#### Combine remaining sequences into one FASTA and dereplicate
-```{bash}
-cd $merged_dir
-
-obiuniq -m sample *_id.fastq > all.uniq.fasta
-echo obicount all.uniq.fasta
-```
+Now navigate to the notebook `Step2b_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
 
