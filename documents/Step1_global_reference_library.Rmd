@@ -1,0 +1,95 @@
+---
+title: "Step1 - create global reference library"
+author: "B.Littleford-Colquhoun"
+date: "2023-09-21"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+here::i_am("documents/Step1_global_reference_library.Rmd")
+```
+
+## Environment Setup
+This notebook can be used to run the OBITools 2 pipeline to download a global reference database and serves as a tutorial. 
+
+Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline, but, be sure to update parameters and thresholds before running!
+```{r include=FALSE}
+#install.packages("pacman")
+pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
+```
+
+```{bash include=FALSE}
+# load modules?
+```
+
+#### Update parameters and thresholds
+This section of the pipeline needs to be checked *every* time you run this pipeline!
+```{r}
+primer_mismatch <- 2 # -e in cutadapt and ecoPCR; this determines the maximum number of mismatches allowed when removing primers using cutadapt and in the in-silico PCR using obitools
+min_read_length <- 8 # -l in obigrep; shortest expected length of the DNA fragment you are amplifying (excluding primers)
+max_read_length <- 300 # -L in obigrep; longest expected length of the DNA fragment you are amplifying (excluding primers)
+F_primer <- DNAString("GGGCAATCCTGAGCCAA") #forward primer used in PCR (or you are interested in using)
+R_primer <- DNAString("CCATTGAGTCTCTGCACCTATC") ##reverse primer used in PCR (or you are interested in using)
+
+## make environment variables that can be passed to bash code chunks
+Sys.setenv(primer_mismatch = primer_mismatch)
+Sys.setenv(min_read_length = min_read_length)
+Sys.setenv(max_read_length = max_read_length)
+Sys.setenv(F_primer = F_primer)
+Sys.setenv(R_primer = R_primer)
+```
+
+
+#### Download newest version of global reference library in EMBL format
+```{bash}
+mkdir DDMMYYYY_EMBL #create new directory for sequence files
+cd DDMMYYYY_EMBL #move into that new directory
+wget -P $EMBL -nH --cut-dirs=5 -A rel_std_pln_*.dat.gz -m ftp://ftp.ebi.ac.uk/pub/databases/embl/release/std/ #download files (here, we are downloading plant ('pln') files, but you can change this depending on what files you want to download)
+gunzip *.gz #unzip downloaded files
+cd .. #move out directory
+# can we play around with --cut-dirs=5? Perhaps this will download smaller files we can process quicker?
+```
+
+
+#### Download taxonomy files
+```{bash}
+mkdir DDMMYYYY_TAXO 
+cd DDMMYYYY_TAXO
+wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz #download taxonomy files
+tar -zxvf taxdump.tar.gz
+cd ..
+```
+
+
+#### Convert EMBL sequence files to ecoPCR format 
+```{bash}
+obiconvert --embl -t ./TAXO --ecopcrdb-output=DDMMYYYecoPCRformat ./EMBL/*.dat --skip-on-error
+
+#count number of entries in full EMBL database
+obicount DDMMYYYecoPCRformat
+```
+
+#### Use ecoPCR to simulate an in silico amplification
+```{bash}
+#this in silico amplification will simulate a PCR on the full global reference database and only retain portions of sequences which contain the amplicon you are interested in (e.g. P6 region of the trnL gene) 
+ecoPCR -d DDMMYYYecoPCRformat -e $primer_mismatch -l $min_read_length -L $max_read_length -k $F_primer $R_primer > DDMMYYYY_P6set
+
+#convert to fasta file to be able to inspect file if needed
+obiconvert --ecopcr --fasta-output \
+'DDMMYYYY_P6set' > DDMMYYYY_P6set.fasta
+
+#remove redundant sequences by dereplicating reads into unique sequences
+obiuniq -d DDMMYYYecoPCRformat \
+DDMMYYYY_P6set.fasta > DDMMYYYY_P6set_uniq.fasta
+
+#ensure that sequences each have a unique identification
+obiannotate --uniq-id DDMMYYYY_P6set_uniq.fasta > db_DDMMYYYY_P6set.fasta
+
+#check number of sequences in fasta file
+obicount db_DDMMYYYY_P6set.fasta
+```
