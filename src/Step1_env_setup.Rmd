@@ -29,6 +29,7 @@ dir.create(merged_path)
 dir.create(controls_path)
 file.copy(from=here("src"), to=here(today), recursive=TRUE)
 file.copy(from=here("data"), to=here(today), recursive=TRUE)
+
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(samples_dir=samples_path)
 Sys.setenv(output_dir=output_path)
