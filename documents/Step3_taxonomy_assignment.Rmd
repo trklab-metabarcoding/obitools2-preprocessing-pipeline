@@ -15,17 +15,14 @@ here::i_am("documents/Step3_taxonomy_assignment.Rmd")
 ```
 
 ## Environment Setup
+This notebook can be used to run the OBITools 2 pipeline to assign taxonomy to sequence reads and serves as a tutorial. 
 
-This notebook can be used to run the OBITools 2 pipeline and serves as a tutorial. Run through each code chunk and inspect the outputs or select Run All from the dropdown above to run the whole pipeline. First, update the parameters in the first code chunk.
-
+Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline.
 ```{r include=FALSE}
 #install.packages("pacman")
 pacman::p_load(here)
 ```
 
-```{bash include=FALSE}
-# load modules?
-```
 
 #### Assign taxonomy to each sequence using the global reference library
 ```{bash}
@@ -36,8 +33,7 @@ ecotag -d ./global_ref_lib/embl_r143/embl_r143 -R ./global_ref_lib/embl_r143/db_
 obicount ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.fasta
 ```
 
-
-Un-useful attributes can be removed from file
+Un-useful attributes can be removed from sequences
 ```{bash}
 obiannotate --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
   --delete-tag=obiclean_count --delete-tag=obiclean_singletoncount \
@@ -52,7 +48,7 @@ obicount -a ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta
 ```
 
 
-### Create output for use in PhyloSeq
+### Create output for use in phyloseq
 ```{bash}
 obitab -o ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta > ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.tab
 ```
