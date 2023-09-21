@@ -1,0 +1,59 @@
+---
+title: "Step 3 - assign taxonomy"
+author: "B.Littleford-Colquhoun"
+date: "2023-09-21"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+here::i_am("documents/Step3_taxonomy_assignment.Rmd")
+```
+
+## Environment Setup
+
+This notebook can be used to run the OBITools 2 pipeline and serves as a tutorial. Run through each code chunk and inspect the outputs or select Run All from the dropdown above to run the whole pipeline. First, update the parameters in the first code chunk.
+
+```{r include=FALSE}
+#install.packages("pacman")
+pacman::p_load(here)
+```
+
+```{bash include=FALSE}
+# load modules?
+```
+
+#### Assign taxonomy to each sequence using the global reference library
+```{bash}
+# Can we add paths here instead of writing them? It would also be great for the prefix of the outputted file to be the date?
+ecotag -d ./global_ref_lib/embl_r143/embl_r143 -R ./global_ref_lib/embl_r143/db_P6_r143.fasta ./merged/20230725_alluniq.l8.L300.c2.clean.fasta > ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.fasta
+
+#Count number of sequences in your file
+obicount ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.fasta
+```
+
+
+Un-useful attributes can be removed from file
+```{bash}
+obiannotate  --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
+  --delete-tag=obiclean_count --delete-tag=obiclean_singletoncount \
+  --delete-tag=obiclean_cluster --delete-tag=obiclean_internalcount \
+  --delete-tag=obiclean_head --delete-tag=taxid_by_db --delete-tag=obiclean_headcount \
+  --delete-tag=id_status --delete-tag=rank_by_db --delete-tag=order_name \
+  --delete-tag=order ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.fasta > \
+  ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta
+
+#count number of sequences in file (should match above)
+obicount -a ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta
+```
+
+
+### Create output ready for use in PhyloSeq
+```{bash}
+obitab -o ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta > ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.tab
+```
+
