@@ -1,0 +1,74 @@
+---
+title: "Step 3 - assign taxonomy"
+author: "B.Littleford-Colquhoun"
+date: "2023-09-21"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Environment Setup
+This notebook can be used to run the OBITools 2 pipeline to assign taxonomy to sequence reads and serves as a tutorial. 
+
+Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline.
+```{r include=FALSE}
+#install.packages("pacman")
+pacman::p_load(here)
+
+here::i_am("documents/Step3_taxonomy_assignment.Rmd")
+```
+
+
+#### Set up standard path variables
+Here, you want to enter the folder name that you created during step2
+```{r}
+DATE<-"YYYY-MM-DD"
+FILE_NAME<-"YYYYDDMM_alluniq.clean.fasta"
+
+cleaned_obitools_fasta<-file.path(here(DATE/results/merged, "FILE_NAME"))
+
+global_ref_db<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/embl_r143") #-d in ecotag; ecoPCR taxonomy Database name
+ref_seq<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/db_P6_r143.fasta") #-R in ecotag; fasta file containing the reference sequences
+
+Sys.setenv(cleaned_obitools_fasta=cleaned_obitools_fasta)
+Sys.setenv(global_ref_db=global_ref_db)
+Sys.setenv(ref_seq=ref_seq)
+Sys.setenv(DATE=DATE)
+```
+
+
+#### Assign taxonomy to each sequence using the global reference library
+```{bash}
+# Can we add paths here instead of writing them? It would also be great for the prefix of the outputted file to be the date?
+ecotag -d ${global_ref_db} -R ${ref_seq} ${cleaned_obitools_fasta} > ./results/merged/${DATE}_alluniq.clean.tag.fasta
+
+#Count number of sequences in your file
+obicount ./results/merged/${DATE}_alluniq.clean.tag.fasta
+```
+
+Un-useful attributes can be removed from sequences
+```{bash}
+obiannotate --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
+  --delete-tag=obiclean_count --delete-tag=obiclean_singletoncount \
+  --delete-tag=obiclean_cluster --delete-tag=obiclean_internalcount \
+  --delete-tag=obiclean_head --delete-tag=taxid_by_db --delete-tag=obiclean_headcount \
+  --delete-tag=id_status --delete-tag=rank_by_db --delete-tag=order_name \
+  --delete-tag=order ./results/merged/${DATE}_alluniq.clean.tag.fasta > \
+  ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta
+
+#count number of sequences in file (should match above)
+obicount -a ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta
+```
+
+
+### Create output for use in phyloseq
+```{bash}
+obitab -o ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta > ./results/merged/${DATE}_alluniq.clean.tag.ann.tab
+```
+
