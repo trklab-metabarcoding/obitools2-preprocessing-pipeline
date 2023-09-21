@@ -18,7 +18,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ```{r include=FALSE}
 #install.packages("pacman") # if then
 pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
-here::i_am("documents/Step2a_data_prep.Rmd")
+here::i_am("src/Step2a_data_prep.Rmd")
 ```
 
 #### Update parameters and thresholds
@@ -55,7 +55,7 @@ R_primer_reverse <- reverseComplement(R_primer)
 F_primer_reverse 
 R_primer_reverse
 
-## ## make environment variables that can be passed to bash code chunks
+## make environment variables that can be passed to bash code chunks
 
 Sys.setenv(F_primer_reverse = F_primer_reverse)
 Sys.setenv(R_primer_reverse = R_primer_reverse)
@@ -66,7 +66,7 @@ The following dates are pulled from the sample sheet and can be used to filter o
 ```{r}
 extraction_date <- as.list(unique(sample_sheet$`Ext date`))
 pcr_date <- as.list(unique(sample_sheet$`PCR date`))
-sequencing_date <- as.list(unique(sample_sheet$`seq date`))
+sequencing_date <- as.list(unique(sample_sheet$`Seq date`))
 ```
 
 #### Rename files with project-specific sample names
@@ -81,6 +81,19 @@ df <- data.frame(field_name, lab_name)
 file_names <- stringr::str_replace_all(file_names_original, setNames(df$field_name, df$lab_name))
 file.rename(file_names_original, file_names)
 ```
+
+```{r}
+control_samples <- sample_sheet %>% 
+  filter(Control == "Y")
+control_samples <- unique(control_samples$SampleID)
+```
+
+
+```{r}
+capture.output(control_samples, file = here(today, 'results/control_list.txt'))
+capture.output(file_names, file = here(today, 'results/file_names.txt'))
+```
+
 
 ```{r}
 sampleNames <- as.list(field_name)

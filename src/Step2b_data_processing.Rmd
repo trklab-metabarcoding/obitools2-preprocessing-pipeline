@@ -26,7 +26,7 @@ do
     -r ${sample}_S[0-9]+_L001_R2_001_trimmed.fastq.gz \
     ${sample}_S[0-9]+_L001_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
     
-    echo obicount ${sample}_merged.fastq
+    obicount ${sample}_merged.fastq
 done
 
 ```
@@ -49,18 +49,58 @@ do
 
     echo "On sample: $sample"
     
-  obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
+    obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
 
 done
 
 mv *_id.fastq $merged_dir
 ```
 
-#### Combine remaining sequences into one FASTA and dereplicate
+#### Inspect read counts in fecal samples vs controls
 ```{bash}
 cd $merged_dir
+obistat -c sample *_id.fastq
+```
 
+#### Combine remaining sequences into one FASTA and dereplicate
+```{bash}
 obiuniq -m sample *_id.fastq > all.uniq.fasta
-echo obicount all.uniq.fasta
+obicount all.uniq.fasta
+```
+
+#### Filter results to just `count` and `merged_sample` attributes in FASTA headers
+```{bash}
+obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
+```
+
+#### Inspect the `count` attribute
+```{bash}
+# get the counting statistics on the ‘count’ attribute
+obistat -c count all.uniq.fasta | sort -nk1 | head -20
+```
+
+#### Created tabulated file for counts per sequence read
+```{bash}
+obitab -o all.uniq.fasta > all.uniq.tab
+```
+
+Use this space to take notes on the controls that have been looked into. For example, something like this: 
+```
+BLA20220920.A
+6671/17628 (38%) – Glehnia littoralis = American silvertop
+3442/5438 (63%) – Musa balbisiana = plantain
+```
+#### Move all the control samples over to an archive directory
+Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
+```{r}
+merged_files <- list.files(merged_dir, pattern="*.fastq", full.names = T)
+```
+
+```{r}
+control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_filess)]
+```
+
+```{r}
+control_files
 ```
 
