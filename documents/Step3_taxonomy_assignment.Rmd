@@ -39,7 +39,7 @@ obicount ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.fasta
 
 Un-useful attributes can be removed from file
 ```{bash}
-obiannotate  --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
+obiannotate --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
   --delete-tag=obiclean_count --delete-tag=obiclean_singletoncount \
   --delete-tag=obiclean_cluster --delete-tag=obiclean_internalcount \
   --delete-tag=obiclean_head --delete-tag=taxid_by_db --delete-tag=obiclean_headcount \
@@ -52,7 +52,7 @@ obicount -a ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta
 ```
 
 
-### Create output ready for use in PhyloSeq
+### Create output for use in PhyloSeq
 ```{bash}
 obitab -o ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.fasta > ./merged/global.20230725_alluniq.l8.L300.c2.clean.tag.ann.tab
 ```
