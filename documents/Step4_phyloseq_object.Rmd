@@ -1,0 +1,79 @@
+---
+title: "Step 4 - create phyloseq object from obitools output"
+author: "B.Littleford-Colquhoun"
+date: "2023-09-21"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+here::i_am("documents/Step4_phyloseq_object.Rmd.Rmd")
+```
+
+
+## Environment Setup
+This notebook can be used to create thwe files needed to create a phyloseq object and serves as a tutorial. 
+
+Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline.
+```{r include=FALSE}
+#install.packages("pacman")
+pacman::p_load(here, vegan, vegetarian, phyloseq, dplyr, tidyr)
+```
+
+
+#### Import obitools output and sample metadata files
+```{r}
+dat_global<-read.csv("/Volumes/Research/IBES_KartzinelLab/Shared/Sequencing_DataStorage/Fray Jorge/20230818_merging runs using g:h primers/merged/global.20230823_all.l8.L300.c2.clean.tag.ann.tab", sep="\t", header=TRUE)
+
+dat_samples<-read.csv("/Volumes/Research/IBES_KartzinelLab/Shared/Sequencing_DataStorage/Fray Jorge/20230818_merging runs using g:h primers/merged/20230824_sampledata_FJ.csv")
+```
+
+
+#### Inspect obitools output 
+Here, we need to clean the obitools file to only include the information relevant for the creation of the phyloseq object
+```{r}
+nrow(dat_global) 
+ncol(dat_global) 
+
+dat_global <- dat_global %>% dplyr::select(-contains("obiclean_status"))
+
+colnames(dat_global) #allows you to copy the correct "best_identity" column name
+
+global_keep<-dat_global[which(dat_global$best_identity.db_P6_r143==1),] #only keep the taxonomic assignments that have 100% match to the global reference database
+
+global_keep$scientific_name<-make.unique(as.character(global_keep$scientific_name))
+
+nrow(global_keep) 
+```
+
+
+#### Create input files for phyloseq 
+```{r}
+OTU_table<-global_keep[,grep("sample\\.", colnames(global_keep))]
+names(OTU_table) <- gsub(pattern = "sample.", replacement = "", x = names(OTU_table))
+rownames(OTU_table) <- sub("^", "P", rownames(OTU_table))
+
+tax_table<-global_keep[,-grep("sample\\.", colnames(global_keep))]
+tax_table<- relocate(tax_table, id, definition, best_identity.db_P6_r143, best_match.db_P6_r143, count, .after = last_col())
+tax_table2<- as.matrix(tax_table)
+rownames(tax_table2) <- sub("^", "P", rownames(tax_table2))
+
+rownames(dat_samples)<- dat_samples$SampleID
+```
+
+
+#### Create phyloseq object
+```{r}
+OTU <- otu_table(OTU_table, taxa_are_rows = TRUE)
+TAX = tax_table(tax_table2)
+samples = sample_data(dat_samples)
+FJ_diet_global_20230824 <- phyloseq(OTU, TAX, samples)
+FJ_diet_global_20230824
+
+saveRDS(FJ_diet_global_20230824, here("FJ_diet_global_20230824.rds"))
+```
+
