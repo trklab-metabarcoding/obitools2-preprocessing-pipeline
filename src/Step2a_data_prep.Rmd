@@ -13,8 +13,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Environment Setup
-
 This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs. First, update the parameters in the first few code chunks.
 
 ```{r include=FALSE}
@@ -24,6 +22,7 @@ here::i_am("documents/Step2a_data_prep.Rmd")
 ```
 
 #### Update parameters and thresholds
+
 ```{r}
 # OBITools parameters
 min_read_count <- 1000
@@ -48,25 +47,8 @@ Sys.setenv(F_primer = F_primer)
 Sys.setenv(R_primer = R_primer)
 ```
 
-#### Set up standard path variables
-```{r}
-today <- Sys.Date()
-dir.create(here(today))
-samples_path <- file.path(here(today,"data"))
-output_path <- file.path(here(today, "results"))
-merged_path <- file.path(here(today, "results/merged"))
-sample_sheet <- read_xlsx(here("data/sample_sheet_test.xlsx"), col_types = "guess")
-dir.create(samples_path)
-dir.create(output_path)
-dir.create(merged_path)
-
-## make environment variables that can be passed to bash code chunks
-Sys.setenv(samples_dir=samples_path)
-Sys.setenv(output_dir=output_path)
-Sys.setenv(merged_dir=merged_path)
-```
-
 #### Generate some additional parameters from inputs
+
 ```{r}
 F_primer_reverse <- reverseComplement(F_primer)
 R_primer_reverse <- reverseComplement(R_primer)
@@ -78,7 +60,9 @@ R_primer_reverse
 Sys.setenv(F_primer_reverse = F_primer_reverse)
 Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```
+
 The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
+
 ```{r}
 extraction_date <- as.list(unique(sample_sheet$`Ext date`))
 pcr_date <- as.list(unique(sample_sheet$`PCR date`))
@@ -86,6 +70,7 @@ sequencing_date <- as.list(unique(sample_sheet$`seq date`))
 ```
 
 #### Rename files with project-specific sample names
+
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
@@ -103,9 +88,11 @@ Sys.setenv(sampleNames = "sampleNames")
 ```
 
 #### Trim primers with Cutadapt
+
 This section will strip off the primers and send the "stdout" to a file so we can keep track of what was removed for each sample.
 
 **NOTE** At this point, the code chunks switch over from R to Bash
+
 ```{bash}
 # installing cutadapt - create environment to install into
 conda create -n cutadaptenv
@@ -125,15 +112,16 @@ do
 done
 ```
 
-Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect ~95%+ of reads to be retained and ~50-70% of bps. 
+Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
+
 ```{bash}
 paste sampleNames <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt
+
 ```{bash}
 conda deactivate
 ```
 
 Now navigate to the notebook `Step2b_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
-

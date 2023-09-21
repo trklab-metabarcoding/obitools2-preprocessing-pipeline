@@ -1,0 +1,36 @@
+---
+title: "Step1_environment_setup"
+author: "T. Divoll"
+date: "2023-09-12"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+### Environment Setup
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Set up standard path variables
+```{r}
+today <- Sys.Date()
+dir.create(here(today))
+samples_path <- file.path(here(today,"data"))
+output_path <- file.path(here(today, "results"))
+merged_path <- file.path(here(today, "results/merged"))
+controls_path <- file.path(here(today, "results/control_samples"))
+sample_sheet <- read_xlsx(here("data/sample_sheet_test.xlsx"), col_types = "guess")
+dir.create(samples_path)
+dir.create(output_path)
+dir.create(merged_path)
+dir.create(controls_path)
+file.copy(from=here("src"), to=here(today,"src"), recursive = TRUE)
+## make environment variables that can be passed to bash code chunks
+Sys.setenv(samples_dir=samples_path)
+Sys.setenv(output_dir=output_path)
+Sys.setenv(merged_dir=merged_path)
+```
+
