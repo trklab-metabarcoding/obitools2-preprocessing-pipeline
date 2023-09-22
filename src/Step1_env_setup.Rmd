@@ -19,16 +19,16 @@ knitr::opts_chunk$set(echo = TRUE)
 today <- Sys.Date()
 dir.create(here(today))
 src_path <- file.path(here(today, "src"))
-samples_path <- file.path(here(today, "data"))
+samples_path <- file.path(here(today, "data/test_data"))
 output_path <- file.path(here(today, "results"))
 merged_path <- file.path(here(today, "results/merged"))
 controls_path <- file.path(here(today, "results/control_samples"))
-sample_sheet <- read_xlsx(here("data/sample_sheet_test.xlsx"), col_types = "guess")
+sample_sheet <- read_xlsx(here("data/test_data/sample_sheet_test.xlsx"), col_types = "guess")
 dir.create(output_path)
 dir.create(merged_path)
 dir.create(controls_path)
 file.copy(from=here("src"), to=here(today), recursive=TRUE)
-file.copy(from=here("data"), to=here(today), recursive=TRUE)
+file.copy(from=here("data/test_data"), to=here(today), recursive=TRUE)
 
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(samples_dir=samples_path)
@@ -36,4 +36,6 @@ Sys.setenv(output_dir=output_path)
 Sys.setenv(merged_dir=merged_path)
 Sys.setenv(src_dir=src_path)
 ```
+
+
 

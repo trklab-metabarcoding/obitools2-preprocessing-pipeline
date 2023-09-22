@@ -11,6 +11,7 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
+here::i_am("src/Step2b_data_processing.Rmd")
 ```
 
 #### Merge Illumina forward and reverse reads
@@ -79,7 +80,7 @@ obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 obistat -c count all.uniq.fasta | sort -nk1 | head -20
 ```
 
-#### Created tabulated file for counts per sequence read
+#### Create a tabulated file for counts per sequence read
 ```{bash}
 obitab -o all.uniq.fasta > all.uniq.tab
 ```
@@ -93,14 +94,20 @@ BLA20220920.A
 #### Move all the control samples over to an archive directory
 Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
 ```{r}
-merged_files <- list.files(merged_dir, pattern="*.fastq", full.names = T)
+merged_files <- list.files(here(today, "results/merged"), pattern="*id.fastq", full.names = T)
 ```
 
 ```{r}
-control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_filess)]
+control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_files)]
+```
+
+Add all of the `*id.fastq` files you want to move to the list named `samples_to_move`. This will move them to a `bad_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
+```{r}
+samples_to_move <- c("","")
 ```
 
 ```{r}
-control_files
+move_files(samples_to_move, "results/bad_samples", overwrite = FALSE)
 ```
 
+Now navigate to the notebook `Step2c_data_cleaning.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
