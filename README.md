@@ -15,11 +15,13 @@ There are three ways to interact with Oscar:
 
 Option #1 is recommended for this use case, and allows us to choose a newer version of R.
 
-- [ ] Navigate to the link in #1 and choose R version 4.2.0. 
+- [ ] Navigate to the link in #1 and choose R version 4.2.0.
+- [ ] Under Modules put `git/2.29.2`.
 - [ ] Launch the session once it has been allocated. 
 - [ ] Go to the terminal pane and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
 - [ ] Now `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
-- [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
+- [ ] Also in the terminal: `cd obitools2-pipeline`
+- [ ] In the Files panes, double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
 ![Rproj example](images/Rproj-example.png)
 
 **Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
