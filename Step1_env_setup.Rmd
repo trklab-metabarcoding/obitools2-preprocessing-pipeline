@@ -14,6 +14,12 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r include=FALSE}
+#install.packages("pacman") # if then
+pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
+here::i_am("src/Step2a_data_prep.Rmd")
+```
+
 #### Set up standard path variables
 ```{r}
 today <- Sys.Date()

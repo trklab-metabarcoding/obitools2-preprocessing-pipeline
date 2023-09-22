@@ -14,21 +14,10 @@ knitr::opts_chunk$set(echo = TRUE)
 here::i_am("src/Step2b_data_processing.Rmd")
 ```
 
-#### Install OBITools
-```{bash}
-
-#first create obitools-env to call python 2.7 
-conda create -n obitools-env python=2.7
-conda activate obitools-env
-conda install -c bioconda obitools
-conda install -c bioconda ecoprimers
-conda install -c bioconda ecopcr
-```
-
 #### Merge Illumina forward and reverse reads
 
 ```{bash}
-# Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
+#Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
 
 for sample in $(cat sampleNames)
 do
@@ -40,6 +29,7 @@ do
     
     obicount ${sample}_merged.fastq
 done
+
 ```
 
 #### Filter out unaligned reads
