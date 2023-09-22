@@ -20,13 +20,12 @@ Run through each code chunk and inspect the outputs or select "Run All" from the
 ```{r include=FALSE}
 #install.packages("pacman")
 pacman::p_load(here)
-
-here::i_am("documents/Step3_taxonomy_assignment.Rmd")
+here::i_am("src/Step3_taxonomy_assignment.Rmd")
 ```
 
 
 #### Set up standard path variables
-Here, you want to enter the folder name that you created during step2
+Here, you want to enter the folder name that you created during Step2
 ```{r}
 DATE<-"YYYY-MM-DD" #edit YYYYY-MM-DD to match the anlaysis folder name that was created when running step2
 FILE_NAME<-"YYYYDDMM_alluniq.clean.fasta" #edit the YYYYMMDD to match the date of the file you created at the end of step2
@@ -73,4 +72,3 @@ This is your final OBITools output (resembles a large ASV/OTU table) that can be
 ```{bash}
 obitab -o ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta > ./results/merged/${DATE}_alluniq.clean.tag.ann.tab
 ```
-
