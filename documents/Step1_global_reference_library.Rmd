@@ -1,5 +1,5 @@
 ---
-title: "Step1 - create global reference library"
+title: "Create global reference library"
 author: "B.Littleford-Colquhoun"
 date: "2023-09-21"
 output: 
@@ -23,9 +23,6 @@ Run through each code chunk and inspect the outputs or select "Run All" from the
 pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
 ```
 
-```{bash include=FALSE}
-# load modules?
-```
 
 #### Update parameters and thresholds
 This section of the pipeline needs to be checked *every* time you run this pipeline!
@@ -44,22 +41,34 @@ Sys.setenv(F_primer = F_primer)
 Sys.setenv(R_primer = R_primer)
 ```
 
+Set the date so that you can call this in later steps when naming files
+```{bash}
+DATE=$(date +%Y%m%d)
+echo "$DATE"
+```
+
+
+#### Navigate to global_reference_library folder on tkarzin
+Make sure to check that you are in the correct folder for the type of global reference library you are downloading; this tutorial currently points to the plant reference library
+```{bash}
+cd /oscar/data/tkartzin/global_ref_lib_plants
+```
+
 
 #### Download newest version of global reference library in EMBL format
 ```{bash}
-mkdir DDMMYYYY_EMBL #create new directory for sequence files
-cd DDMMYYYY_EMBL #move into that new directory
+mkdir ${DATE}_EMBL #create new directory for sequence files
+cd ${DATE}_EMBL #move into that new directory
 wget -P $EMBL -nH --cut-dirs=5 -A rel_std_pln_*.dat.gz -m ftp://ftp.ebi.ac.uk/pub/databases/embl/release/std/ #download files (here, we are downloading plant ('pln') files, but you can change this depending on what files you want to download)
 gunzip *.gz #unzip downloaded files
 cd .. #move out directory
-# can we play around with --cut-dirs=5? Perhaps this will download smaller files we can process quicker?
 ```
 
 
 #### Download taxonomy files
 ```{bash}
-mkdir DDMMYYYY_TAXO 
-cd DDMMYYYY_TAXO
+mkdir ${DATE}_TAXO 
+cd ${DATE}_TAXO
 wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz #download taxonomy files
 tar -zxvf taxdump.tar.gz
 cd ..
@@ -68,28 +77,29 @@ cd ..
 
 #### Convert EMBL sequence files to ecoPCR format 
 ```{bash}
-obiconvert --embl -t ./TAXO --ecopcrdb-output=DDMMYYYecoPCRformat ./EMBL/*.dat --skip-on-error
+obiconvert --embl -t ./TAXO --ecopcrdb-output=${DATE}_ecoPCRformat ./EMBL/*.dat --skip-on-error
 
 #count number of entries in full EMBL database
-obicount DDMMYYYecoPCRformat
+obicount ${DATE}_ecoPCRformat
 ```
+
 
 #### Use ecoPCR to simulate an in silico amplification
 ```{bash}
 #this in silico amplification will simulate a PCR on the full global reference database and only retain portions of sequences which contain the amplicon you are interested in (e.g. P6 region of the trnL gene) 
-ecoPCR -d DDMMYYYecoPCRformat -e $primer_mismatch -l $min_read_length -L $max_read_length -k $F_primer $R_primer > DDMMYYYY_P6set
+ecoPCR -d ${DATE}_ecoPCRformat -e ${primer_mismatch} -l ${min_read_length} -L ${max_read_length} -k ${F_primer} ${R_primer} > ${DATE}_P6set
 
 #convert to fasta file to be able to inspect file if needed
 obiconvert --ecopcr --fasta-output \
-'DDMMYYYY_P6set' > DDMMYYYY_P6set.fasta
+'${DATE}_P6set' > ${DATE}_P6set.fasta
 
 #remove redundant sequences by dereplicating reads into unique sequences
-obiuniq -d DDMMYYYecoPCRformat \
-DDMMYYYY_P6set.fasta > DDMMYYYY_P6set_uniq.fasta
+obiuniq -d ${DATE}ecoPCRformat \
+${DATE}_P6set.fasta > ${DATE}_P6set_uniq.fasta
 
 #ensure that sequences each have a unique identification
-obiannotate --uniq-id DDMMYYYY_P6set_uniq.fasta > db_DDMMYYYY_P6set.fasta
+obiannotate --uniq-id ${DATE}_P6set_uniq.fasta > db_${DATE}_P6set.fasta
 
 #check number of sequences in fasta file
-obicount db_DDMMYYYY_P6set.fasta
+obicount db_${DATE}_P6set.fasta
 ```
