@@ -11,12 +11,12 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
-here::i_am("documents/Step4_phyloseq_object.Rmd.Rmd")
+here::i_am("documents/Step4_phyloseq_object.Rmd")
 ```
 
 
 ## Environment Setup
-This notebook can be used to create thwe files needed to create a phyloseq object and serves as a tutorial. 
+This notebook can be used to create the files needed to create a phyloseq object and serves as a tutorial. 
 
 Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline.
 ```{r include=FALSE}
@@ -25,11 +25,11 @@ pacman::p_load(here, vegan, vegetarian, phyloseq, dplyr, tidyr)
 ```
 
 
-#### Import obitools output and sample metadata files
+#### Set up standard path variables
 ```{r}
-dat_global<-read.csv("/Volumes/Research/IBES_KartzinelLab/Shared/Sequencing_DataStorage/Fray Jorge/20230818_merging runs using g:h primers/merged/global.20230823_all.l8.L300.c2.clean.tag.ann.tab", sep="\t", header=TRUE)
+dat_global<-read.csv(here("results", "merged", "YYYYMMDD_alluniq.clean.tag.ann.tab", header=TRUE)) #edit YYYYMMDD to match date of the file you want to use from step3
 
-dat_samples<-read.csv("/Volumes/Research/IBES_KartzinelLab/Shared/Sequencing_DataStorage/Fray Jorge/20230818_merging runs using g:h primers/merged/20230824_sampledata_FJ.csv")
+dat_samples<-read.csv(here("results", "merged", "SAMPLE_DATA.csv")) #need to save your metadata file (as a .csv file) that you want used in your phyloseq object in your results/merged folder and call it here by name. This metadata file should include all samples included in the tab file. 
 ```
 
 
@@ -43,7 +43,7 @@ dat_global <- dat_global %>% dplyr::select(-contains("obiclean_status"))
 
 colnames(dat_global) #allows you to copy the correct "best_identity" column name
 
-global_keep<-dat_global[which(dat_global$best_identity.db_P6_r143==1),] #only keep the taxonomic assignments that have 100% match to the global reference database
+global_keep<-dat_global[which(dat_global$best_identity.db_P6_r143==1),] #only keep the taxonomic assignments that have 100% match to the global reference database. Be sure to edit best_identity name here (e.g. "best_identity.db_P6_r143"). 
 
 global_keep$scientific_name<-make.unique(as.character(global_keep$scientific_name))
 
@@ -71,9 +71,9 @@ rownames(dat_samples)<- dat_samples$SampleID
 OTU <- otu_table(OTU_table, taxa_are_rows = TRUE)
 TAX = tax_table(tax_table2)
 samples = sample_data(dat_samples)
-FJ_diet_global_20230824 <- phyloseq(OTU, TAX, samples)
-FJ_diet_global_20230824
+YYYYMMDD_PROJECT <- phyloseq(OTU, TAX, samples) #edit YYYYMMDD_PROJECT to your specific samples (e.g. 20230922_YNP)
+YYYYMMDD_PROJECT
 
-saveRDS(FJ_diet_global_20230824, here("FJ_diet_global_20230824.rds"))
+saveRDS(YYYYMMDD_PROJECT, here("YYYYMMDD_PROJECT"))
 ```
 
