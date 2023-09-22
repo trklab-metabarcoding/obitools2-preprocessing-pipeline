@@ -1,0 +1,113 @@
+---
+title: "Step2b_data_processing"
+author: "T. Divoll"
+date: "2023-09-12"
+output: 
+  html_document:
+  df_print: paged
+  toc: true
+---
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+here::i_am("src/Step2b_data_processing.Rmd")
+```
+
+#### Merge Illumina forward and reverse reads
+
+```{bash}
+#Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
+
+for sample in $(cat sampleNames)
+do
+    echo "On sample: $sample"
+    
+    illuminapairedend --score-min=$matching_score \
+    -r ${sample}_S[0-9]+_L001_R2_001_trimmed.fastq.gz \
+    ${sample}_S[0-9]+_L001_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
+    
+    obicount ${sample}_merged.fastq
+done
+
+```
+
+#### Filter out unaligned reads
+```{bash}
+for sample in $(cat sampleNames)
+do
+
+    echo "On sample: $sample"
+    
+    obigrep -p 'mode!="joined"' ${sample}_merged.fastq > ${sample}_ali.fastq
+done
+```
+
+#### Add sample names to each file
+```{bash}
+for sample in $(cat sampleNames)
+do
+
+    echo "On sample: $sample"
+    
+    obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
+
+done
+
+mv *_id.fastq $merged_dir
+```
+
+#### Inspect read counts in fecal samples vs controls
+```{bash}
+cd $merged_dir
+obistat -c sample *_id.fastq
+```
+
+#### Combine remaining sequences into one FASTA and dereplicate
+```{bash}
+obiuniq -m sample *_id.fastq > all.uniq.fasta
+obicount all.uniq.fasta
+```
+
+#### Filter results to just `count` and `merged_sample` attributes in FASTA headers
+```{bash}
+obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
+```
+
+#### Inspect the `count` attribute
+```{bash}
+# get the counting statistics on the ‘count’ attribute
+obistat -c count all.uniq.fasta | sort -nk1 | head -20
+```
+
+#### Create a tabulated file for counts per sequence read
+```{bash}
+obitab -o all.uniq.fasta > all.uniq.tab
+```
+
+Use this space to take notes on the controls that have been looked into. For example, something like this: 
+```
+BLA20220920.A
+6671/17628 (38%) – Glehnia littoralis = American silvertop
+3442/5438 (63%) – Musa balbisiana = plantain
+```
+#### Move all the control samples over to an archive directory
+Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
+```{r}
+merged_files <- list.files(here(today, "results/merged"), pattern="*id.fastq", full.names = T)
+```
+
+```{r}
+control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_files)]
+```
+
+Add all of the `*id.fastq` files you want to move to the list named `samples_to_move`. This will move them to a `bad_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
+```{r}
+samples_to_move <- c("","")
+```
+
+```{r}
+move_files(samples_to_move, "results/bad_samples", overwrite = FALSE)
+```
+
+Now navigate to the notebook `Step2c_data_cleaning.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
