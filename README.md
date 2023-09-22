@@ -7,15 +7,15 @@ The following steps provide guidance on connecting to an RStudio server on Oscar
 
 There are three ways to interact with Oscar: 
 
-1. Through a virtual linux desktop called [Open OnDemand](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand) (full desktop with access to files, a command-line shell, and RStudio
+1. Through an [RStudio Server](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand/using-rstudio) hosted on Open OnDemand. All interactions are through the various RStudio panes.
 
-2. Through an [RStudio Server](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand/using-rstudio) hosted on Open OnDemand. All interactions are through the various RStudio panes.
+2. Through a virtual linux desktop called [Open OnDemand](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand) (full desktop with access to files, a command-line shell, and RStudio
 
 3. Through a [SSH tunnel](https://docs.ccv.brown.edu/oscar/getting-started) in a terminal (command-line only)
 
-Option #2 is recommended for this use case, and allows us to choose a newer version of R.
+Option #1 is recommended for this use case, and allows us to choose a newer version of R.
 
-- [ ] Navigate to the link in #2 and choose R version 4.2.0. 
+- [ ] Navigate to the link in #1 and choose R version 4.2.0. 
 - [ ] Launch the session once it has been allocated. 
 - [ ] Go to the terminal pane and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
 - [ ] Now `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
@@ -40,17 +40,23 @@ This first notebook generates a new folder with today's date for you analysis, a
 ### 2. `Step2a_data_prep.Rmd`
 The second notebook is where you set all of your parameters for trimming, filtering, primers, etc. This notebook also runs `cutadapt` to trim off primers.
 ### 3. `Step2b_data_processing.Rmd`
-The third notebook filters files and merges all the reads into one file. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis. 
+The third notebook filters files and merges all the reads into one file per sample. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis.
 ### 4. `Step2c_data_cleaning.Rmd`
-The fourth notebook re-runs the merging steps with the bad samples removed and cleans the data set to perpare if for taxonomy assignment.
+The fourth notebook re-runs the merging steps with the bad samples removed and cleans the data set to prepare if for taxonomy assignment.
 ### 5. `Step3_taxonomy_assignment.Rmd`
 The final notebook is for assigning taxonomy to your cleaned reads!
+
+## Check for latest code
+
+There are a few git commands that can help make sure you always have the latest code versions when running your analyses.
+* `git status` - check which branch you are on and view staging area; you should see the `main` branch 
+* `git pull` - this is always good to run after you verify you are on main. It will pull down any changes since the last time you ran an analysis.
 
 ## Tips for Development
 
 Useful git commands:
 
-* `git status` - check which branch you are on and view staging area
+
 * `git add <file>` - add a file to the staging area
 * `git commit -m "<descriptive message>"` - commit the staged changes with a message (required)
 * `git switch <branch>` - change to a different branch
