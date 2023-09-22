@@ -1,6 +1,6 @@
 ---
 title: "Create global reference library"
-author: "B.Littleford-Colquhoun"
+author: "B.Littleford-Colquhoun & T. Divoll"
 date: "2023-09-21"
 output: 
   html_document:
