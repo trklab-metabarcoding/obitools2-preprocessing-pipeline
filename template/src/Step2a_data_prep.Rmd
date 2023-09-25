@@ -16,9 +16,10 @@ knitr::opts_chunk$set(echo = TRUE)
 This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs. First, update the parameters in the first few code chunks.
 
 ```{r include=FALSE}
-#install.packages("pacman") # if then
-pacman::p_load(here, tidyverse, readxl, Biostrings, stringr)
-here::i_am("src/Step2a_data_prep.Rmd")
+if (!require("pacman")) install.packages("pacman")
+if (!require("BiocManager", quietly = TRUE))
+pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
+here::i_am(file.path(here(today, "src/Step2a_data_prep.Rmd")))
 ```
 
 #### Update parameters and thresholds

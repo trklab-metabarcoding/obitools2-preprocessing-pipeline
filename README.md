@@ -16,7 +16,7 @@ There are three ways to interact with Oscar:
 Option #1 is recommended for this use case, and allows us to choose a newer version of R.
 
 - [ ] Navigate to the link in #1 and choose R version 4.2.0.
-- [ ] Under Modules put `git/2.29.2`.
+- [ ] Under Modules put `git/2.29.2 anaconda/2022.05`.
 - [ ] Launch the session once it has been allocated. 
 - [ ] Go to the terminal pane and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
 - [ ] Now `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
@@ -29,16 +29,29 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 ## Workflow structure
 
 The main folders in this repository are:
-`data`: this contains a `test_data` folder
-`documents`: for any docs you want to store with your analysis
-`results`: all the results from running cutadapt and obitools commands
-`src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
+`data`: this can be used to copy over your dataset
+`images`: this is just for the images used in the README
+`template`: this contains `test_data` and `src` folders
+    `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
+    `test_data`: a simple dataset to use for learning the workflow
+
+## Getting data into your workflow
+
+The easiest way to copy over your data is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
+![smb_example](images/smb_example.png)
+
+- `cd <your_folder>/obitools2-pipeline/template/data`; now drag and drop your files from local. They will get copied over into a dated folder.
+
+Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the headers and make a `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo.
 
 ## Running the Notebooks
 
-Navigate to the `src` folder to view the available notebooks.
+**Note:** The first notebook is in the parent directory.
+The notebooks can be opened by double-clicking from the RStudio `Files` window.
 ### 1. `Step1_env_setup.Rmd`
-This first notebook generates a new folder with today's date for you analysis, and copies over test data, source notebooks, and the empty results folder.
+This first notebook generates a new folder with today's date for you analysis, and copies over data, source notebooks, and the empty results folder.
+
+Next navigate to the `src` folder to view the analysis notebooks.
 ### 2. `Step2a_data_prep.Rmd`
 The second notebook is where you set all of your parameters for trimming, filtering, primers, etc. This notebook also runs `cutadapt` to trim off primers.
 ### 3. `Step2b_data_processing.Rmd`
@@ -48,7 +61,7 @@ The fourth notebook re-runs the merging steps with the bad samples removed and c
 ### 5. `Step3_taxonomy_assignment.Rmd`
 The final notebook is for assigning taxonomy to your cleaned reads!
 
-## Check for latest code
+## Check for the latest code
 
 There are a few git commands that can help make sure you always have the latest code versions when running your analyses.
 * `git status` - check which branch you are on and view staging area; you should see the `main` branch 
@@ -57,7 +70,6 @@ There are a few git commands that can help make sure you always have the latest 
 ## Tips for Development
 
 Useful git commands:
-
 
 * `git add <file>` - add a file to the staging area
 * `git commit -m "<descriptive message>"` - commit the staged changes with a message (required)

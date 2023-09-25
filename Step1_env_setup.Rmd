@@ -14,7 +14,15 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r include=FALSE}
+if (!require("pacman")) install.packages("pacman")
+if (!require("BiocManager", quietly = TRUE))
+pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
+here::i_am("Step1_env_setup.Rmd")
+```
+
 #### Set up standard path variables
+Update the `samples_path` to `here(today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx"). Also reduce the from path in the file copy (line 39) to just ``from=here("data")``. Similarly, reduce the from path in the file copy (line 40) to just ``from=here("sample_sheet.xlsx")``.
 ```{r}
 today <- Sys.Date()
 dir.create(here(today))
@@ -23,12 +31,13 @@ samples_path <- file.path(here(today, "data/test_data"))
 output_path <- file.path(here(today, "results"))
 merged_path <- file.path(here(today, "results/merged"))
 controls_path <- file.path(here(today, "results/control_samples"))
-sample_sheet <- read_xlsx(here("data/test_data/sample_sheet_test.xlsx"), col_types = "guess")
+sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess")
 dir.create(output_path)
 dir.create(merged_path)
 dir.create(controls_path)
-file.copy(from=here("src"), to=here(today), recursive=TRUE)
-file.copy(from=here("data/test_data"), to=here(today), recursive=TRUE)
+file.copy(from=here("template/src"), to=here(today), recursive=TRUE)
+file.copy(from=here("template/test_data"), to=here(today), recursive=TRUE)
+file.copy(from=here("sample_sheet_test.xlsx"), to=here(today))
 
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(samples_dir=samples_path)
@@ -36,6 +45,3 @@ Sys.setenv(output_dir=output_path)
 Sys.setenv(merged_dir=merged_path)
 Sys.setenv(src_dir=src_path)
 ```
-
-
-
