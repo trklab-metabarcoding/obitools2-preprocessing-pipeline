@@ -49,7 +49,7 @@ Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the
 **Note:** The first notebook is in the parent directory.
 The notebooks can be opened by double-clicking from the RStudio `Files` window.
 ### 1. `Step1_env_setup.Rmd`
-This first notebook generates a new folder with today's date for you analysis, and copies over test data, source notebooks, and the empty results folder.
+This first notebook generates a new folder with today's date for you analysis, and copies over data, source notebooks, and the empty results folder.
 
 Next navigate to the `src` folder to view the analysis notebooks.
 ### 2. `Step2a_data_prep.Rmd`
