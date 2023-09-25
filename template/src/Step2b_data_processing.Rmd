@@ -110,4 +110,8 @@ samples_to_move <- c("","")
 move_files(samples_to_move, "results/bad_samples", overwrite = FALSE)
 ```
 
+Let's also move this first data set to archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.
+```{r}
+move_files(c("all.uniq.fasta", "all.uniq.tab"), "results/bad_samples", overwrite = FALSE)
+```
 Now navigate to the notebook `Step2c_data_cleaning.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
