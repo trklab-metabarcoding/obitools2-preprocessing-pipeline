@@ -11,7 +11,7 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
-here::i_am("src/Step2c_data_cleaning.Rmd")
+here::i_am(file.path(here(today, "src/Step2c_data_cleaning.Rmd")))
 ```
 
 Now that you've inspected all the controls and potentially bad samples, and moved them out of the working folder, we rerun the merging steps and clean the final merged data set.

@@ -18,11 +18,11 @@ This notebook can be used to run the OBITools 2 pipeline to assign taxonomy to s
 
 Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline.
 ```{r include=FALSE}
-#install.packages("pacman")
-pacman::p_load(here)
-here::i_am("src/Step3_taxonomy_assignment.Rmd")
+if (!require("pacman")) install.packages("pacman")
+if (!require("BiocManager", quietly = TRUE))
+pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
+here::i_am(file.path(here(today, "src/Step3_taxonomy_assignment.Rmd")))
 ```
-
 
 #### Set up standard path variables
 Here, you want to enter the folder name that you created during Step2

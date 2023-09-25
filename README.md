@@ -35,16 +35,18 @@ The main folders in this repository are:
     `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
     `test_data`: a simple dataset to use for learning the workflow
 
-## Getting do into your workflow
+## Getting data into your workflow
 
 The easiest way to copy over your data is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
 ![smb_example](images/smb_example.png)
 
-- `cd <your_folder>/obitools2-pipeline/data`; drag and drop your files from local
+- `cd <your_folder>/obitools2-pipeline/template/data`; now drag and drop your files from local. They will get copied over into a dated folder.
+
+Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the headers and make a `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo.
 
 ## Running the Notebooks
 
-**Note:**The first notebook is in the parent directory.
+**Note:** The first notebook is in the parent directory.
 The notebooks can be opened by double-clicking from the RStudio `Files` window.
 ### 1. `Step1_env_setup.Rmd`
 This first notebook generates a new folder with today's date for you analysis, and copies over test data, source notebooks, and the empty results folder.

@@ -11,7 +11,13 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
-here::i_am("src/Step2b_data_processing.Rmd")
+
+```
+```{r include=FALSE}
+if (!require("pacman")) install.packages("pacman")
+if (!require("BiocManager", quietly = TRUE))
+pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
+here::i_am(file.path(here(today, "src/Step2b_data_processing.Rmd")))
 ```
 
 #### Merge Illumina forward and reverse reads
