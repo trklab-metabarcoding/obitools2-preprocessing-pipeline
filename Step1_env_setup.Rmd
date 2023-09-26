@@ -6,42 +6,55 @@ output:
   html_document:
   df_print: paged
   toc: true
+params:
+    today: !r Sys.Date()
+    #obitools params
+    min_read_count: 1000
+    min_read_length: 8 # -l in obigrep
+    max_read_length: 300 # -L in obigrep
+    clean_threshold: 0.05 # -r in obiclean
+    matching_score: 40 # --score-min in illuminapairedend
+    #cutadapt params
+    primer_mismatch: 2
+    F_primer: "GGGCAATCCTGAGCCAA"
+    R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
 ### Environment Setup
 
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
+do.call('Sys.setenv', params)
 ```
 
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
 if (!require("BiocManager", quietly = TRUE))
-pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
+pacman::p_load(here, tidyr, dplyr, readxl, stringr, Biostrings)
 here::i_am("Step1_env_setup.Rmd")
 ```
 
 #### Set up standard path variables
 Update the `samples_path` to `here(today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx"). Also reduce the from path in the file copy (line 39) to just ``from=here("data")``. Similarly, reduce the from path in the file copy (line 40) to just ``from=here("sample_sheet.xlsx")``.
 ```{r}
-today <- Sys.Date()
-dir.create(here(today))
-src_path <- file.path(here(today, "src"))
-samples_path <- file.path(here(today, "data/test_data"))
-output_path <- file.path(here(today, "results"))
-merged_path <- file.path(here(today, "results/merged"))
-controls_path <- file.path(here(today, "results/control_samples"))
+dir.create(here(params$today))
+work_dir <- file.path(here(params$today))
+src_path <- file.path(here(params$today, "src"))
+samples_path <- file.path(here(params$today, "test_data"))
+output_path <- file.path(here(params$today, "results"))
+merged_path <- file.path(here(params$today, "results/merged"))
+controls_path <- file.path(here(params$today, "results/control_samples"))
 sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess")
 dir.create(output_path)
 dir.create(merged_path)
 dir.create(controls_path)
-file.copy(from=here("template/src"), to=here(today), recursive=TRUE)
-file.copy(from=here("template/test_data"), to=here(today), recursive=TRUE)
-file.copy(from=here("sample_sheet_test.xlsx"), to=here(today))
+file.copy(from=here("template/src"), to=here(params$today), recursive=TRUE)
+file.copy(from=here("template/test_data"), to=here(params$today), recursive=TRUE)
+file.copy(from=here("sample_sheet_test.xlsx"), to=here(params$today))
 
 ## make environment variables that can be passed to bash code chunks
-Sys.setenv(samples_dir=samples_path)
-Sys.setenv(output_dir=output_path)
-Sys.setenv(merged_dir=merged_path)
-Sys.setenv(src_dir=src_path)
+Sys.setenv(samples_path=samples_path)
+Sys.setenv(output_path=output_path)
+Sys.setenv(merged_path=merged_path)
+Sys.setenv(src_path=src_path)
 ```

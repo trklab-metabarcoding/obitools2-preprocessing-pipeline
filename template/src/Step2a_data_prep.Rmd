@@ -10,7 +10,6 @@ output:
 
 ```{r setup, include=FALSE}
 # set global chunk parameters here
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs. First, update the parameters in the first few code chunks.
@@ -18,32 +17,17 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
 if (!require("BiocManager", quietly = TRUE))
-pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
-here::i_am(file.path(here(today, "src/Step2a_data_prep.Rmd")))
+pacman::p_load(here, tidyr, dplyr, readxl, stringr, Biostrings)
 ```
 
 #### Update parameters and thresholds
 
 ```{r}
-# OBITools parameters
-min_read_count <- 1000
-min_read_length <- 8 # -l in obigrep
-max_read_length <- 300 # -L in obigrep
-clean_threshold <- 0.05 # -r in obiclean
-matching_score <- 40 # --score-min in illuminapairedend
-
-# Cutadapt parameters
-cutadapt_mismatch <- 2 # -e in cutadapt
-F_primer <- DNAString("GGGCAATCCTGAGCCAA")
-R_primer <- DNAString("CCATTGAGTCTCTGCACCTATC")
+# Generate reverse primer strings
+F_primer <- DNAString(params$F_primer)
+R_primer <- DNAString(params$R_primer)
 
 ## make environment variables that can be passed to bash code chunks
-Sys.setenv(cutadapt_mismatch = cutadapt_mismatch)
-Sys.setenv(min_read_count = min_read_count)
-Sys.setenv(min_read_length = min_read_length)
-Sys.setenv(max_read_length = max_read_length)
-Sys.setenv(clean_threshold = clean_threshold)
-Sys.setenv(matching_score = matching_score)
 Sys.setenv(F_primer = F_primer)
 Sys.setenv(R_primer = R_primer)
 ```
@@ -75,7 +59,7 @@ sequencing_date <- as.list(unique(sample_sheet$`Seq date`))
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
-file_names_original <- list.files(samples_dir, pattern=".gz", full.names = T) 
+file_names_original <- list.files(samples_path, pattern=".gz", full.names = T)
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
@@ -84,21 +68,13 @@ file.rename(file_names_original, file_names)
 ```
 
 ```{r}
-control_samples <- sample_sheet %>% 
-  filter(Control == "Y")
+control_samples <- sample_sheet %>% filter(Control == "Y")
 control_samples <- unique(control_samples$SampleID)
 ```
 
-
 ```{r}
-capture.output(control_samples, file = here(today, 'results/control_list.txt'))
-capture.output(file_names, file = here(today, 'results/file_names.txt'))
-```
-
-
-```{r}
-sampleNames <- as.list(field_name)
-Sys.setenv(sampleNames = "sampleNames")
+capture.output(control_samples, file = here(params$today, 'results/control_list.txt'))
+capture.output(file_names, file = here(params$today, 'results/file_names.txt'))
 ```
 
 #### Trim primers with Cutadapt
@@ -109,13 +85,17 @@ This section will strip off the primers and send the "stdout" to a file so we ca
 
 ```{bash}
 # installing cutadapt - create environment to install into
-conda create -n cutadaptenv
+#conda create -n cutadaptenv -c conda-forge -c bioconda cutadapt python=3.9
 conda activate cutadaptenv
-conda install -c bioconda cutadapt
 ```
 
 ```{bash}
-cd output_dir
+cd $samples_path
+ls *_R1_001.fastq.gz | cut -f1 -d "_" > ../results/sampleNames
+```
+
+```{bash}
+
 
 for sample in $(cat sampleNames)
 do
@@ -129,6 +109,8 @@ done
 Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
 
 ```{bash}
+conda activate cutadapt
+cd $output_path
 paste sampleNames <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
 ```
 
