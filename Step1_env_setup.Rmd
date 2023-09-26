@@ -29,13 +29,12 @@ do.call('Sys.setenv', params)
 
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-if (!require("BiocManager", quietly = TRUE))
-pacman::p_load(here, tidyr, dplyr, readxl, stringr, Biostrings)
+pacman::p_load(here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 here::i_am("Step1_env_setup.Rmd")
 ```
 
 #### Set up standard path variables
-Update the `samples_path` to `here(today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx"). Also reduce the from path in the file copy (line 39) to just ``from=here("data")``. Similarly, reduce the from path in the file copy (line 40) to just ``from=here("sample_sheet.xlsx")``.
+Update the `samples_path` to `here(today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx")`. Also reduce the from path in the file copy (line 39) to just `from=here("data")`. Similarly, reduce the from path in the file copy (line 40) to just `from=here("sample_sheet.xlsx")`.
 ```{r}
 dir.create(here(params$today))
 work_dir <- file.path(here(params$today))
@@ -43,7 +42,7 @@ src_path <- file.path(here(params$today, "src"))
 samples_path <- file.path(here(params$today, "test_data"))
 output_path <- file.path(here(params$today, "results"))
 merged_path <- file.path(here(params$today, "results/merged"))
-controls_path <- file.path(here(params$today, "results/control_samples"))
+bad_controls_path <- file.path(here(params$today, "results/bad_control_samples"))
 sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess")
 dir.create(output_path)
 dir.create(merged_path)

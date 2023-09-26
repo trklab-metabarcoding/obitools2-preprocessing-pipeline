@@ -19,18 +19,16 @@ This notebook can be used to run the OBITools 2 pipeline to assign taxonomy to s
 Run through each code chunk and inspect the outputs or select "Run All" from the dropdown above to run the whole pipeline.
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-if (!require("BiocManager", quietly = TRUE))
-pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
-here::i_am(file.path(here(today, "src/Step3_taxonomy_assignment.Rmd")))
+pacman::p_load(here, tidyr, dplyr, readxl, stringr, spgs)
 ```
 
 #### Set up standard path variables
 Here, you want to enter the folder name that you created during Step2
 ```{r}
-DATE<-"YYYY-MM-DD" #edit YYYYY-MM-DD to match the anlaysis folder name that was created when running step2
-FILE_NAME<-"YYYYDDMM_alluniq.clean.fasta" #edit the YYYYMMDD to match the date of the file you created at the end of step2
+DATE<-"YYYY-MM-DD" #edit YYYY-MM-DD to match the analysis folder name that was created when running step2
+FILE_NAME<-"YYYYMMDD_alluniq.clean.fasta" #edit the YYYYMMDD to match the date of the file you created at the end of step2 in the "merged_path" directory.
 
-cleaned_obitools_fasta<-file.path(here(DATE/results/merged, "FILE_NAME")) #should not need to edit this code as it pulls the date and file name you set in the previous 2 lines of code
+cleaned_obitools_fasta<-file.path(here(DATE, "results/merged", FILE_NAME)) #should not need to edit this code as it pulls the date and file name you set in the previous 2 lines of code
 
 global_ref_db<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/embl_r143") #-d in ecotag; ecoPCR taxonomy Database name. Need to edit YYYYMMDD and name of taxonomy database to match that of the most recent global reference library you want to use.
 
@@ -46,14 +44,22 @@ Sys.setenv(DATE=DATE)
 
 #### Assign taxonomy to each sequence using the global reference library
 ```{bash}
-ecotag -d ${global_ref_db} -R ${ref_seq} ${cleaned_obitools_fasta} > ./results/merged/${DATE}_alluniq.clean.tag.fasta
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
+ecotag -d ${global_ref_db} -R ${ref_seq} ${cleaned_obitools_fasta} > ${DATE}_alluniq.clean.tag.fasta
 
 #Count number of sequences in your file
-obicount ./results/merged/${DATE}_alluniq.clean.tag.fasta
+obicount ${DATE}_alluniq.clean.tag.fasta
 ```
 
 Un-useful attributes can be removed from sequences
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 obiannotate --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
   --delete-tag=obiclean_count --delete-tag=obiclean_singletoncount \
   --delete-tag=obiclean_cluster --delete-tag=obiclean_internalcount \
@@ -63,12 +69,15 @@ obiannotate --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount
   ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta
 
 #count number of sequences in file (should match above)
-obicount -a ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta
+obicount -a ${DATE}_alluniq.clean.tag.ann.fasta
 ```
-
 
 ### Create output for use in phyloseq
 This is your final OBITools output (resembles a large ASV/OTU table) that can be used to create a phyloseq object in the next step
 ```{bash}
-obitab -o ./results/merged/${DATE}_alluniq.clean.tag.ann.fasta > ./results/merged/${DATE}_alluniq.clean.tag.ann.tab
+source ~/.bash_profile
+conda activate obitools-env2
+cd $merged_path
+
+obitab -o ${DATE}_alluniq.clean.tag.ann.fasta > ${DATE}_alluniq.clean.tag.ann.tab
 ```

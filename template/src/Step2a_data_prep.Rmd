@@ -16,8 +16,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-if (!require("BiocManager", quietly = TRUE))
-pacman::p_load(here, tidyr, dplyr, readxl, stringr, Biostrings)
+pacman::p_load(here, tidyr, dplyr, readxl, stringr, spgs)
 ```
 
 #### Update parameters and thresholds
@@ -35,8 +34,8 @@ Sys.setenv(R_primer = R_primer)
 #### Generate some additional parameters from inputs
 
 ```{r}
-F_primer_reverse <- reverseComplement(F_primer)
-R_primer_reverse <- reverseComplement(R_primer)
+F_primer_reverse <- reverseComplement(params$F_primer)
+R_primer_reverse <- reverseComplement(params$R_primer)
 F_primer_reverse 
 R_primer_reverse
 
@@ -85,38 +84,50 @@ This section will strip off the primers and send the "stdout" to a file so we ca
 
 ```{bash}
 # installing cutadapt - create environment to install into
-#conda create -n cutadaptenv -c conda-forge -c bioconda cutadapt python=3.9
+source ~/.bash_profile
+conda create -n cutadaptenv -c conda-forge -c bioconda cutadapt python=3.9
 conda activate cutadaptenv
 ```
 
 ```{bash}
 cd $samples_path
-ls *_R1_001.fastq.gz | cut -f1 -d "_" > ../results/sampleNames
+ls *_R1_001.fastq.gz | cut -f1-2 -d "_" > sampleNames
 ```
 
 ```{bash}
+cd $samples_path
+cat sampleNames
+```
 
-
+```{bash}
+source ~/.bash_profile
+conda activate cutadapt
+cd $samples_path
 for sample in $(cat sampleNames)
 do
 
     echo "On sample: $sample"
   
-    cutadapt -a ^$F_primer...$R_primer_reverse -A ^$R_primer...$R_primer_reverse --no-indels -e $cutadapt_mismatch --discard-untrimmed -o ${sample}_S[0-9]+_L001_R1_001_trimmed.fastq.gz -p ${sample}_S[0-9]+_L001_R2_001_trimmed.fastq.gz ${sample}_S[0-9]+_L001_R1_001.fastq.gz ${sample}_S[0-9]+_L001_R2_001.fastq.gz >> cutadapt_primer_trimming_stats.txt 2>&1
+    cutadapt -a ^$F_primer...$R_primer_reverse -A ^$R_primer...$R_primer_reverse --no-indels -e $primer_mismatch --discard-untrimmed -o ${sample}_L001_R1_001_trimmed.fastq.gz -p ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001.fastq.gz ${sample}_L001_R2_001.fastq.gz >> cutadapt_primer_trimming_stats.txt 2>&1
 done
+
+mv *trimmed.fastq.gz $output_path
 ```
 
 Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
 
 ```{bash}
+source ~/.bash_profile
 conda activate cutadapt
 cd $output_path
+
 paste sampleNames <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt
 
 ```{bash}
+source ~/.bash_profile
 conda deactivate
 ```
 
