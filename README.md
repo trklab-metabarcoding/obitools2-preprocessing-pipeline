@@ -26,6 +26,8 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 
 **Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
 
+**Note:** If Conda is not found when running code chunks, add this line to your `.bash_profile` in your home directory on Oscar: `export PATH=~/gpfs/runtime/opt/anaconda/2022.05/bin:$PATH`
+
 ## Workflow structure
 
 The main folders in this repository are:
