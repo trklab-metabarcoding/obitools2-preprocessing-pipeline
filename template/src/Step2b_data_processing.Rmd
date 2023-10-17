@@ -11,27 +11,28 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
-
 ```
-```{r include=FALSE}
-if (!require("pacman")) install.packages("pacman")
-if (!require("BiocManager", quietly = TRUE))
-pacman::p_load(here, tidyverse, readxl, stringr, Biostrings)
-here::i_am(file.path(here(today, "src/Step2b_data_processing.Rmd")))
+
+#### Set up Conda env for OBITools
+
+```{bash}
+source ~/.bash_profile
+conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7
 ```
 
 #### Merge Illumina forward and reverse reads
 
 ```{bash}
 #Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
+source ~/.bash_profile
+conda activate obitools-env
+cd $output_path
 
 for sample in $(cat sampleNames)
 do
     echo "On sample: $sample"
     
-    illuminapairedend --score-min=$matching_score \
-    -r ${sample}_S[0-9]+_L001_R2_001_trimmed.fastq.gz \
-    ${sample}_S[0-9]+_L001_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
+    illuminapairedend --score-min=$matching_score -r ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
     
     obicount ${sample}_merged.fastq
 done
@@ -40,6 +41,10 @@ done
 
 #### Filter out unaligned reads
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $output_path
+
 for sample in $(cat sampleNames)
 do
 
@@ -51,6 +56,10 @@ done
 
 #### Add sample names to each file
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $output_path
+
 for sample in $(cat sampleNames)
 do
 
@@ -60,35 +69,60 @@ do
 
 done
 
-mv *_id.fastq $merged_dir
+mv *_id.fastq $merged_path
 ```
 
 #### Inspect read counts in fecal samples vs controls
 ```{bash}
-cd $merged_dir
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 obistat -c sample *_id.fastq
 ```
 
 #### Combine remaining sequences into one FASTA and dereplicate
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 obiuniq -m sample *_id.fastq > all.uniq.fasta
+
 obicount all.uniq.fasta
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 ```
 
 #### Inspect the `count` attribute
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 # get the counting statistics on the ‘count’ attribute
 obistat -c count all.uniq.fasta | sort -nk1 | head -20
 ```
 
 #### Create a tabulated file for counts per sequence read
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 obitab -o all.uniq.fasta > all.uniq.tab
+```
+#### Read the tab file as a table in R
+After running the cell below, open the table from the Environment tab and inspect the results!
+```{r}
+all_uniq_tab <- read.delim(here(merged_path, "all.uniq.tab"), header=TRUE)
 ```
 
 Use this space to take notes on the controls that have been looked into. For example, something like this: 
@@ -100,24 +134,25 @@ BLA20220920.A
 #### Move all the control samples over to an archive directory
 Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
 ```{r}
-merged_files <- list.files(here(today, "results/merged"), pattern="*id.fastq", full.names = T)
+merged_files <- list.files(here(params$today, "results/merged"), pattern="*id.fastq", full.names = T)
 ```
 
 ```{r}
 control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_files)]
 ```
 
-Add all of the `*id.fastq` files you want to move to the list named `samples_to_move`. This will move them to a `bad_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
+Add all of the `*id.fastq` files you want to move to the list named `samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
 ```{r}
-samples_to_move <- c("","")
+samples_to_move <- c("", "")
 ```
 
 ```{r}
-move_files(samples_to_move, "results/bad_samples", overwrite = FALSE)
+move_files(control_files, bad_controls_path, overwrite = FALSE)
+move_files(samples_to_move, bad_controls_path, overwrite = FALSE)
 ```
 
 Let's also move this first data set to archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.
 ```{r}
-move_files(c("all.uniq.fasta", "all.uniq.tab"), "results/bad_samples", overwrite = FALSE)
+move_files(c(here(merged_path, "all.uniq.fasta"), here(merged_path, "all.uniq.tab")), bad_controls_path, overwrite = FALSE)
 ```
 Now navigate to the notebook `Step2c_data_cleaning.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)

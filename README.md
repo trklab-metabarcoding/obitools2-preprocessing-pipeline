@@ -26,6 +26,8 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 
 **Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
 
+**Note:** If Conda is not found when running code chunks, add this line to your `.bash_profile` in your home directory on Oscar: `export PATH=~/gpfs/runtime/opt/anaconda/2022.05/bin:$PATH`
+
 ## Workflow structure
 
 The main folders in this repository are:
@@ -48,6 +50,8 @@ Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the
 
 **Note:** The first notebook is in the parent directory.
 The notebooks can be opened by double-clicking from the RStudio `Files` window.
+The first step is to update all of the `params` in the YAML header of the first notebook. 
+
 ### 1. `Step1_env_setup.Rmd`
 This first notebook generates a new folder with today's date for you analysis, and copies over data, source notebooks, and the empty results folder.
 

@@ -11,52 +11,78 @@ output:
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
-here::i_am(file.path(here(today, "src/Step2c_data_cleaning.Rmd")))
 ```
 
 Now that you've inspected all the controls and potentially bad samples, and moved them out of the working folder, we rerun the merging steps and clean the final merged data set.
 
 #### Combine remaining sequences into one FASTA and dereplicate
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env2
+cd $merged_path
+
 obiuniq -m sample *_id.fastq > all.uniq.fasta
 obicount all.uniq.fasta
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 ```
 
 #### Inspect the `count` attribute
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 # get the counting statistics on the ‘count’ attribute
 obistat -c count all.uniq.fasta | sort -nk1 | head -20
 ```
 
 #### Create a tabulated file for counts per sequence read
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env2
+cd $merged_path
+
 obitab -o all.uniq.fasta > all.uniq.tab
 ```
 
 #### Filter out sequences by abundance and length
 Keep only the sequences having a count greater or equal to X and a length shorter than Y bp (this should be changed depending on marker and filtering criteria)
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env
+cd $merged_path
+
 todaydate=$(date +%Y%m%d) # grab today's date from the system
 
-obigrep -l ${min_read_length} -L ${max_read_length} -p 'count>=2' all.uniq.fasta > ${todaydate}_all.uniq.fasta
+obigrep -l $min_read_length -L $max_read_length -p 'count>=2' all.uniq.fasta > ${todaydate}_all.uniq.fasta
 ```
 
 #### Clean the sequences for PCR/sequencing errors (sequence variants)
 We keep the head sequences (-H option) that are sequences with no variants with a count greater than 5% of their own count (-r 0.05 option).
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env2
+cd $merged_path
+
 todaydate=$(date +%Y%m%d)
 
-obiclean -s merged_sample -r 0.05 -H ${todaydate}_all.uniq.fasta > ${todaydate}_alluniq.clean.fasta
+obiclean -s merged_sample -r $clean_threshold -H ${todaydate}_all.uniq.fasta > ${todaydate}_alluniq.clean.fasta
 ```
-
 #### Create a tabulated file to check the number of sequence reads in each sample
 
 ```{bash}
+source ~/.bash_profile
+conda activate obitools-env2
+cd $merged_path
+
 todaydate=$(date +%Y%m%d)
 
 obitab -o ${todaydate}_alluniq.clean.fasta > ${todaydate}_alluniq.clean.tab
