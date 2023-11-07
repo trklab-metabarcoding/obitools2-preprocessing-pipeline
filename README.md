@@ -9,12 +9,13 @@ There are three ways to interact with Oscar:
 
 1. Through an [RStudio Server](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand/using-rstudio) hosted on Open OnDemand. All interactions are through the various RStudio panes.
 
-2. Through a virtual linux desktop called [Open OnDemand](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand) (full desktop with access to files, a command-line shell, and RStudio
+2. Through a virtual linux desktop called [Open OnDemand](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand) (full desktop with access to files, a command-line shell, and RStudio)
 
 3. Through a [SSH tunnel](https://docs.ccv.brown.edu/oscar/getting-started) in a terminal (command-line only)
 
 Option #1 is recommended for this use case, and allows us to choose a newer version of R.
 
+- [ ] If not on campus, make sure you are connected to the Brown [VPN](https://it.brown.edu/services/virtual-private-network-vpn)
 - [ ] Navigate to the link in #1 and choose R version 4.2.0.
 - [ ] Under Modules put `git/2.29.2 anaconda/2022.05`.
 - [ ] Launch the session once it has been allocated. 
@@ -31,9 +32,9 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 ## Workflow structure
 
 The main folders in this repository are:
-`data`: this can be used to copy over your dataset
 `images`: this is just for the images used in the README
-`template`: this contains `test_data` and `src` folders
+`template`: this contains `data`, `src`, and `test_data` folders
+    `data`: this can be used to copy over your dataset
     `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
     `test_data`: a simple dataset to use for learning the workflow
 
@@ -82,3 +83,7 @@ Useful git commands:
 * `git pull` - pull the latest changes from the remote repo; a good habit every time you switch to main
 * `git stash` - stash the changes so your branch is clean before you switch to another branch
 * `git stash pop` - pop the changes back out after you have switched to the desired branch
+
+## Troubleshooting
+
+If your R session hangs, the environment variables will be lost, so it is best to start back at the top with Step 1.

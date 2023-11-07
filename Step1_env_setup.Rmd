@@ -20,17 +20,16 @@ params:
     R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
 ### Environment Setup
+```{r include=FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+here::i_am("Step1_env_setup.Rmd")
+```
 
 ```{r setup, include=FALSE}
 # set global chunk parameters here
 knitr::opts_chunk$set(echo = TRUE)
 do.call('Sys.setenv', params)
-```
-
-```{r include=FALSE}
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
-here::i_am("Step1_env_setup.Rmd")
 ```
 
 #### Set up standard path variables
