@@ -8,30 +8,9 @@ output:
   toc: true
 ---
 
-```{r setup, include=FALSE}
-# set global chunk parameters here
-```
-
 This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs. First, update the parameters in the first few code chunks.
-
-```{r include=FALSE}
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(here, tidyr, dplyr, readxl, stringr, spgs)
-```
-
-#### Update parameters and thresholds
-
-```{r}
-# Generate reverse primer strings
-F_primer <- DNAString(params$F_primer)
-R_primer <- DNAString(params$R_primer)
-
-## make environment variables that can be passed to bash code chunks
-Sys.setenv(F_primer = F_primer)
-Sys.setenv(R_primer = R_primer)
-```
-
-#### Generate some additional parameters from inputs
+``
+#### Generate some derived parameters from the Step1 inputs
 
 ```{r}
 F_primer_reverse <- reverseComplement(params$F_primer)
@@ -84,9 +63,9 @@ This section will strip off the primers and send the "stdout" to a file so we ca
 
 ```{bash}
 # installing cutadapt - create environment to install into
+# this only needs to be run once => skip if you have already created this in a prior analysis
 source ~/.bash_profile
 conda create -n cutadaptenv -c conda-forge -c bioconda cutadapt python=3.9
-conda activate cutadaptenv
 ```
 
 ```{bash}
@@ -101,7 +80,7 @@ cat sampleNames
 
 ```{bash}
 source ~/.bash_profile
-conda activate cutadapt
+conda activate cutadaptenv
 cd $samples_path
 for sample in $(cat sampleNames)
 do
@@ -113,15 +92,13 @@ done
 
 mv *trimmed.fastq.gz $output_path
 ```
-
 Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
 
 ```{bash}
 source ~/.bash_profile
 conda activate cutadapt
-cd $output_path
 
-paste sampleNames <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
+paste sampleNames <(grep "passing" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt
