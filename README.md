@@ -33,11 +33,11 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 ## Workflow structure
 
 The main folders in this repository are:
-`images`: this is just for the images used in the README
-`template`: this contains `data`, `src`, and `test_data` folders
- - `data`: this can be used to copy over your dataset
- - `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
- - `test_data`: a simple dataset to use for learning the workflow
+- `images`: this is just for the images used in the README
+- `template`: this contains `data`, `src`, and `test_data` folders
+  - `data`: this can be used to copy over your dataset
+  - `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
+  - `test_data`: a simple dataset to use for learning the workflow
 
 ## Getting data into your workflow
 
