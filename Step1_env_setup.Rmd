@@ -49,7 +49,16 @@ dir.create(bad_controls_path)
 file.copy(from=here("template/src"), to=here(params$today), recursive=TRUE)
 file.copy(from=here("template/test_data"), to=here(params$today), recursive=TRUE)
 file.copy(from=here("sample_sheet_test.xlsx"), to=here(params$today))
+```
+#### Generate some derived parameters from the inputs
 
+```{r}
+F_primer_reverse <- reverseComplement(params$F_primer)
+R_primer_reverse <- reverseComplement(params$R_primer)
+F_primer_reverse 
+R_primer_reverse
+```
+```{r}
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(samples_path=samples_path)
 Sys.setenv(output_path=output_path)
@@ -57,4 +66,6 @@ Sys.setenv(merged_path=merged_path)
 Sys.setenv(src_path=src_path)
 Sys.setenv(F_primer=params$F_primer)
 Sys.setenv(R_primer=params$R_primer)
+Sys.setenv(F_primer_reverse = F_primer_reverse)
+Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```

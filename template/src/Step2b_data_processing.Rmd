@@ -7,15 +7,16 @@ output:
   df_print: paged
   toc: true
 ---
-
-```{r setup, include=FALSE}
-# set global chunk parameters here
-knitr::opts_chunk$set(echo = TRUE)
+```{r include=FALSE}
+## Only needed for knitr to render this notebook
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 ```
 
 #### Set up Conda env for OBITools
 
-```{bash}
+```{bash, install obitools, eval = FALSE, echo = FALSE}
+# this only needs to be run once => skip if you have already created this in a prior analysis
 source ~/.bash_profile
 conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7
 ```
@@ -28,7 +29,7 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $output_path
 
-for sample in $(cat sampleNames)
+for sample in $(cat $samples_path/sampleNames)
 do
     echo "On sample: $sample"
     
@@ -45,7 +46,7 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $output_path
 
-for sample in $(cat sampleNames)
+for sample in $(cat $sample_path/sampleNames)
 do
 
     echo "On sample: $sample"
