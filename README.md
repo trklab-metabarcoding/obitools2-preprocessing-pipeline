@@ -22,7 +22,8 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 - [ ] Go to the terminal pane and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
 - [ ] Now `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
 - [ ] Also in the terminal: `cd obitools2-pipeline`
-- [ ] In the Files panes, double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
+- [ ] In the Files panes, use the menu at the top right to make sure you are also at the same path.
+- [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
 ![Rproj example](images/Rproj-example.png)
 
 **Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
@@ -34,9 +35,9 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 The main folders in this repository are:
 `images`: this is just for the images used in the README
 `template`: this contains `data`, `src`, and `test_data` folders
-    `data`: this can be used to copy over your dataset
-    `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
-    `test_data`: a simple dataset to use for learning the workflow
+ - `data`: this can be used to copy over your dataset
+ - `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
+ - `test_data`: a simple dataset to use for learning the workflow
 
 ## Getting data into your workflow
 
@@ -56,13 +57,19 @@ The first step is to update all of the `params` in the YAML header of the first 
 ### 1. `Step1_env_setup.Rmd`
 This first notebook generates a new folder with today's date for you analysis, and copies over data, source notebooks, and the empty results folder.
 
-Next navigate to the `src` folder to view the analysis notebooks.
+Run all from the drop-down menu to generate parameters and create environment variables.
+
+Next navigate to the `src` folder inside the new folder with today's date to view the analysis notebooks.
+
 ### 2. `Step2a_data_prep.Rmd`
 The second notebook is where you set all of your parameters for trimming, filtering, primers, etc. This notebook also runs `cutadapt` to trim off primers.
+
 ### 3. `Step2b_data_processing.Rmd`
 The third notebook filters files and merges all the reads into one file per sample. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis.
+
 ### 4. `Step2c_data_cleaning.Rmd`
 The fourth notebook re-runs the merging steps with the bad samples removed and cleans the data set to prepare if for taxonomy assignment.
+
 ### 5. `Step3_taxonomy_assignment.Rmd`
 The final notebook is for assigning taxonomy to your cleaned reads!
 
@@ -86,4 +93,5 @@ Useful git commands:
 
 ## Troubleshooting
 
-If your R session hangs, the environment variables will be lost, so it is best to start back at the top with Step 1.
+* If your R session hangs, the environment variables will be lost, so it is best to start back at the top with Step 1.
+* When creating the conda environments in Steps 2a and 2b, they only need to be created once. They will take some time to resolve dependencies when first created, but then can simply be activated each time they are needed thereafter.
