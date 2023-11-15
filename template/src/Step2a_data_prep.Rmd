@@ -70,8 +70,9 @@ cat sampleNames
 ```
 
 ```{bash}
+conda init bash
 source ~/.bash_profile
-conda activate cutadapt
+conda activate cutadaptenv
 cd $samples_path
 for sample in $(cat sampleNames)
 do
@@ -87,9 +88,9 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 
 ```{bash}
 source ~/.bash_profile
-conda activate cutadapt
+conda activate cutadaptenv
 
-paste $samples_path/sampleNames <(grep "passing" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
+paste $samples_path/sampleNames <(grep "passing" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt

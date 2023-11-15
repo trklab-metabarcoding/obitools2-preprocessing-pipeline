@@ -21,8 +21,8 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $merged_path
 
-obiuniq -m sample *_id.fastq > all.uniq.fasta
-obicount all.uniq.fasta
+obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
+obicount all.uniq.fasta --without-progress-bar
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
@@ -41,7 +41,7 @@ conda activate obitools-env
 cd $merged_path
 
 # get the counting statistics on the ‘count’ attribute
-obistat -c count all.uniq.fasta | sort -nk1 | head -20
+obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t
 ```
 
 #### Create a tabulated file for counts per sequence read
@@ -87,7 +87,7 @@ todaydate=$(date +%Y%m%d)
 
 obitab -o ${todaydate}_alluniq.clean.fasta > ${todaydate}_alluniq.clean.tab
 
-obicount ${todaydate}_alluniq.clean.fasta
+obicount ${todaydate}_alluniq.clean.fasta --without-progress-bar
 ```
 
 #### Take notes
