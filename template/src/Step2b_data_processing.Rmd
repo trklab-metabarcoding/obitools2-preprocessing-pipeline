@@ -7,15 +7,16 @@ output:
   df_print: paged
   toc: true
 ---
-
-```{r setup, include=FALSE}
-# set global chunk parameters here
-knitr::opts_chunk$set(echo = TRUE)
+```{r include=FALSE}
+## Only needed for knitr to render this notebook
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 ```
 
 #### Set up Conda env for OBITools
 
-```{bash}
+```{bash, install obitools, eval = FALSE, echo = FALSE}
+# this only needs to be run once => skip if you have already created this in a prior analysis
 source ~/.bash_profile
 conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7
 ```
@@ -28,7 +29,7 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $output_path
 
-for sample in $(cat sampleNames)
+for sample in $(cat $samples_path/sampleNames)
 do
     echo "On sample: $sample"
     
@@ -45,13 +46,11 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $output_path
 
-for sample in $(cat sampleNames)
-do
+for sample in $(cat $samples_path/sampleNames)
 
-    echo "On sample: $sample"
-    
+do
     obigrep -p 'mode!="joined"' ${sample}_merged.fastq > ${sample}_ali.fastq
-done
+done | column -t
 ```
 
 #### Add sample names to each file
@@ -60,14 +59,12 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $output_path
 
-for sample in $(cat sampleNames)
-do
+for sample in $(cat $samples_path/sampleNames)
 
-    echo "On sample: $sample"
-    
+do
     obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
 
-done
+done | column -t
 
 mv *_id.fastq $merged_path
 ```
@@ -78,18 +75,18 @@ source ~/.bash_profile
 conda activate obitools-env
 cd $merged_path
 
-obistat -c sample *_id.fastq
+obistat -c sample *_id.fastq --without-progress-bar | column -t
 ```
 
 #### Combine remaining sequences into one FASTA and dereplicate
-```{bash}
+```{bash quiet=TRUE}
 source ~/.bash_profile
 conda activate obitools-env
 cd $merged_path
 
-obiuniq -m sample *_id.fastq > all.uniq.fasta
+obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 
-obicount all.uniq.fasta
+obicount all.uniq.fasta --without-progress-bar
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
@@ -108,7 +105,7 @@ conda activate obitools-env
 cd $merged_path
 
 # get the counting statistics on the ‘count’ attribute
-obistat -c count all.uniq.fasta | sort -nk1 | head -20
+obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t
 ```
 
 #### Create a tabulated file for counts per sequence read
@@ -141,14 +138,14 @@ merged_files <- list.files(here(params$today, "results/merged"), pattern="*id.fa
 control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_files)]
 ```
 
-Add all of the `*id.fastq` files you want to move to the list named `samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
+Add all of the `*id.fastq` files you want to move to the list named `bad_samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
 ```{r}
-samples_to_move <- c("", "")
+bad_samples_to_move <- c("", "")
 ```
 
 ```{r}
 move_files(control_files, bad_controls_path, overwrite = FALSE)
-move_files(samples_to_move, bad_controls_path, overwrite = FALSE)
+move_files(bad_samples_to_move, bad_controls_path, overwrite = FALSE)
 ```
 
 Let's also move this first data set to archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.

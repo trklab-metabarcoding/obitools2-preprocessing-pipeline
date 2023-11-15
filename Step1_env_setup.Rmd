@@ -20,6 +20,11 @@ params:
     R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
 ### Environment Setup
+```{r include=FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+here::i_am("Step1_env_setup.Rmd")
+```
 
 ```{r setup, include=FALSE}
 # set global chunk parameters here
@@ -27,14 +32,8 @@ knitr::opts_chunk$set(echo = TRUE)
 do.call('Sys.setenv', params)
 ```
 
-```{r include=FALSE}
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
-here::i_am("Step1_env_setup.Rmd")
-```
-
 #### Set up standard path variables
-Update the `samples_path` to `here(today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx")`. Also reduce the from path in the file copy (line 39) to just `from=here("data")`. Similarly, reduce the from path in the file copy (line 40) to just `from=here("sample_sheet.xlsx")`.
+Update the `samples_path` to `here(params$today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx")`. Also reduce the from path in the file copy (line 39) to just `from=here("data")`. Similarly, reduce the from path in the file copy (line 40) to just `from=here("sample_sheet.xlsx")`.
 ```{r}
 dir.create(here(params$today))
 work_dir <- file.path(here(params$today))
@@ -46,14 +45,27 @@ bad_controls_path <- file.path(here(params$today, "results/bad_control_samples")
 sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess")
 dir.create(output_path)
 dir.create(merged_path)
-dir.create(controls_path)
+dir.create(bad_controls_path)
 file.copy(from=here("template/src"), to=here(params$today), recursive=TRUE)
 file.copy(from=here("template/test_data"), to=here(params$today), recursive=TRUE)
 file.copy(from=here("sample_sheet_test.xlsx"), to=here(params$today))
+```
+#### Generate some derived parameters from the inputs
 
+```{r}
+F_primer_reverse <- reverseComplement(params$F_primer)
+R_primer_reverse <- reverseComplement(params$R_primer)
+F_primer_reverse 
+R_primer_reverse
+```
+```{r}
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(samples_path=samples_path)
 Sys.setenv(output_path=output_path)
 Sys.setenv(merged_path=merged_path)
 Sys.setenv(src_path=src_path)
+Sys.setenv(F_primer=params$F_primer)
+Sys.setenv(R_primer=params$R_primer)
+Sys.setenv(F_primer_reverse = F_primer_reverse)
+Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```

@@ -7,10 +7,10 @@ output:
   df_print: paged
   toc: true
 ---
-
-```{r setup, include=FALSE}
-# set global chunk parameters here
-knitr::opts_chunk$set(echo = TRUE)
+```{r include=FALSE}
+## Only needed for knitr to render this notebook
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 ```
 
 Now that you've inspected all the controls and potentially bad samples, and moved them out of the working folder, we rerun the merging steps and clean the final merged data set.
@@ -18,11 +18,11 @@ Now that you've inspected all the controls and potentially bad samples, and move
 #### Combine remaining sequences into one FASTA and dereplicate
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env2
+conda activate obitools-env
 cd $merged_path
 
-obiuniq -m sample *_id.fastq > all.uniq.fasta
-obicount all.uniq.fasta
+obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
+obicount all.uniq.fasta --without-progress-bar
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
@@ -41,20 +41,20 @@ conda activate obitools-env
 cd $merged_path
 
 # get the counting statistics on the ‘count’ attribute
-obistat -c count all.uniq.fasta | sort -nk1 | head -20
+obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t
 ```
 
 #### Create a tabulated file for counts per sequence read
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env2
+conda activate obitools-env
 cd $merged_path
 
 obitab -o all.uniq.fasta > all.uniq.tab
 ```
 
 #### Filter out sequences by abundance and length
-Keep only the sequences having a count greater or equal to X and a length shorter than Y bp (this should be changed depending on marker and filtering criteria)
+Keep only the sequences having a count greater or equal to `min_read_length` and a length shorter than `max_read_length` bp (this should be changed depending on marker and filtering criteria)
 ```{bash}
 source ~/.bash_profile
 conda activate obitools-env
@@ -69,7 +69,7 @@ obigrep -l $min_read_length -L $max_read_length -p 'count>=2' all.uniq.fasta > $
 We keep the head sequences (-H option) that are sequences with no variants with a count greater than 5% of their own count (-r 0.05 option).
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env2
+conda activate obitools-env
 cd $merged_path
 
 todaydate=$(date +%Y%m%d)
@@ -80,14 +80,14 @@ obiclean -s merged_sample -r $clean_threshold -H ${todaydate}_all.uniq.fasta > $
 
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env2
+conda activate obitools-env
 cd $merged_path
 
 todaydate=$(date +%Y%m%d)
 
 obitab -o ${todaydate}_alluniq.clean.fasta > ${todaydate}_alluniq.clean.tab
 
-obicount ${todaydate}_alluniq.clean.fasta
+obicount ${todaydate}_alluniq.clean.fasta --without-progress-bar
 ```
 
 #### Take notes
