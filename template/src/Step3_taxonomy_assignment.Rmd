@@ -25,9 +25,9 @@ FILE_NAME<-sprintf("%s_alluniq.clean.fasta", DATE) #edit the YYYYMMDD to match t
 
 cleaned_obitools_fasta<-file.path(here(DATETIME, "results/merged", FILE_NAME)) #should not need to edit this code as it pulls the date and file name you set in the previous 2 lines of code
 
-global_ref_db<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/20220410/embl_r143") #-d in ecotag; ecoPCR taxonomy Database name. Need to edit YYYYMMDD and name of taxonomy database to match that of the most recent global reference library you want to use.
+global_ref_db<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/embl_r143") #-d in ecotag; ecoPCR taxonomy Database name. Need to edit YYYYMMDD and name of taxonomy database to match that of the most recent global reference library you want to use.
 
-ref_seq<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/20220410/db_P6_r143.fasta") #-R in ecotag; fasta file containing the reference sequences. Need to edit YYYYMMDD and name of fasta file to match that of the most recent global reference library you want to use. 
+ref_seq<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/db_P6_r143.fasta") #-R in ecotag; fasta file containing the reference sequences. Need to edit YYYYMMDD and name of fasta file to match that of the most recent global reference library you want to use. 
 ```
 
 ```{r}
