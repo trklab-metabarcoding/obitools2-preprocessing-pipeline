@@ -43,8 +43,8 @@ control_samples <- unique(control_samples$SampleID)
 ```
 
 ```{r}
-capture.output(control_samples, file = here(params$today, 'results/control_list.txt'))
-capture.output(file_names, file = here(params$today, 'results/file_names.txt'))
+capture.output(control_samples, file = here(params$datetime, 'results/control_list.txt'))
+capture.output(file_names, file = here(params$datetime, 'results/file_names.txt'))
 ```
 
 #### Trim primers with Cutadapt
@@ -72,7 +72,7 @@ cat sampleNames
 ```{bash}
 conda init bash
 source ~/.bash_profile
-conda activate cutadaptenv
+conda activate /users/${user}/.conda/envs/cutadaptenv
 cd $samples_path
 for sample in $(cat sampleNames)
 do
@@ -88,7 +88,7 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 
 ```{bash}
 source ~/.bash_profile
-conda activate cutadaptenv
+conda activate /users/${user}/.conda/envs/cutadaptenv
 
 paste $samples_path/sampleNames <(grep "passing" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
 ```
