@@ -4,10 +4,13 @@ author: "T. Divoll"
 date: "2023-09-12"
 output: 
   html_document:
+  keep_md: TRUE
   df_print: paged
   toc: true
 params:
-    today: !r Sys.Date()
+    datetime: !r (format(Sys.time(), "%Y%m%d_%H:%M"))
+    user: !r Sys.getenv("LOGNAME")
+  
     #obitools params
     min_read_count: 1000
     min_read_length: 8 # -l in obigrep
@@ -33,22 +36,22 @@ do.call('Sys.setenv', params)
 ```
 
 #### Set up standard path variables
-Update the `samples_path` to `here(params$today, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx")`. Also reduce the from path in the file copy (line 39) to just `from=here("data")`. Similarly, reduce the from path in the file copy (line 40) to just `from=here("sample_sheet.xlsx")`.
+Update the `samples_path` to `here(params$datetime, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx")`. Also reduce the from path in the file copy (line 53) to just `from=here("data")`. Similarly, reduce the from path in the file copy (line 54) to just `from=here("sample_sheet.xlsx")`.
 ```{r}
-dir.create(here(params$today))
-work_dir <- file.path(here(params$today))
-src_path <- file.path(here(params$today, "src"))
-samples_path <- file.path(here(params$today, "test_data"))
-output_path <- file.path(here(params$today, "results"))
-merged_path <- file.path(here(params$today, "results/merged"))
-bad_controls_path <- file.path(here(params$today, "results/bad_control_samples"))
-sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess")
+dir.create(here(params$datetime))
+work_dir <- file.path(here(params$datetime))
+src_path <- file.path(here(params$datetime, "src"))
+samples_path <- file.path(here(params$datetime, "test_data")) # edit to use your own data, see text above
+output_path <- file.path(here(params$datetime, "results"))
+merged_path <- file.path(here(params$datetime, "results/merged"))
+bad_controls_path <- file.path(here(params$datetime, "results/bad_control_samples"))
+sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess") # edit to use your own data, see text above
 dir.create(output_path)
 dir.create(merged_path)
 dir.create(bad_controls_path)
-file.copy(from=here("template/src"), to=here(params$today), recursive=TRUE)
-file.copy(from=here("template/test_data"), to=here(params$today), recursive=TRUE)
-file.copy(from=here("sample_sheet_test.xlsx"), to=here(params$today))
+file.copy(from=here("template/src"), to=here(params$datetime), recursive=TRUE)
+file.copy(from=here("template/test_data"), to=here(params$datetime), recursive=TRUE)
+file.copy(from=here("sample_sheet_test.xlsx"), to=here(params$datetime))
 ```
 #### Generate some derived parameters from the inputs
 
@@ -60,6 +63,7 @@ R_primer_reverse
 ```
 ```{r}
 ## make environment variables that can be passed to bash code chunks
+Sys.setenv(user=params$user)
 Sys.setenv(samples_path=samples_path)
 Sys.setenv(output_path=output_path)
 Sys.setenv(merged_path=merged_path)

@@ -26,7 +26,7 @@ conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers e
 ```{bash}
 #Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $output_path
 
 for sample in $(cat $samples_path/sampleNames)
@@ -43,7 +43,7 @@ done
 #### Filter out unaligned reads
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $output_path
 
 for sample in $(cat $samples_path/sampleNames)
@@ -56,7 +56,7 @@ done | column -t
 #### Add sample names to each file
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $output_path
 
 for sample in $(cat $samples_path/sampleNames)
@@ -72,7 +72,7 @@ mv *_id.fastq $merged_path
 #### Inspect read counts in fecal samples vs controls
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $merged_path
 
 obistat -c sample *_id.fastq --without-progress-bar | column -t
@@ -81,7 +81,7 @@ obistat -c sample *_id.fastq --without-progress-bar | column -t
 #### Combine remaining sequences into one FASTA and dereplicate
 ```{bash quiet=TRUE}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $merged_path
 
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
@@ -92,7 +92,7 @@ obicount all.uniq.fasta --without-progress-bar
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $merged_path
 
 obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
@@ -101,7 +101,7 @@ obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 #### Inspect the `count` attribute
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $merged_path
 
 # get the counting statistics on the ‘count’ attribute
@@ -111,7 +111,7 @@ obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | 
 #### Create a tabulated file for counts per sequence read
 ```{bash}
 source ~/.bash_profile
-conda activate obitools-env
+conda activate /users/${user}/.conda/envs/obitools-env
 cd $merged_path
 
 obitab -o all.uniq.fasta > all.uniq.tab
@@ -131,7 +131,7 @@ BLA20220920.A
 #### Move all the control samples over to an archive directory
 Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
 ```{r}
-merged_files <- list.files(here(params$today, "results/merged"), pattern="*id.fastq", full.names = T)
+merged_files <- list.files(here(params$datetime, "results/merged"), pattern="*id.fastq", full.names = T)
 ```
 
 ```{r}
