@@ -19,10 +19,10 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 - [ ] Navigate to the link in #1 and choose R version 4.2.0.
 - [ ] Under Modules put `git/2.29.2 anaconda/2022.05`.
 - [ ] Launch the session once it has been allocated. 
-- [ ] Go to the terminal pane and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
-- [ ] Now `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
+- [ ] Go to the terminal pane in RStudio and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
+- [ ] In that terminal `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
 - [ ] Also in the terminal: `cd obitools2-pipeline`
-- [ ] In the Files panes, use the menu at the top right to make sure you are also at the same path.
+- [ ] In the Files panes of RStudio, use the menu at the top right to make sure you are also at the same path.
 - [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
 ![Rproj example](images/Rproj-example.png)
 
@@ -76,6 +76,8 @@ The final notebook is for assigning taxonomy to your cleaned reads!
 ## Check for the latest code
 
 There are a few git commands that can help make sure you always have the latest code versions when running your analyses.
+
+From the Terminal in RStudio:
 * `git status` - check which branch you are on and view staging area; you should see the `main` branch 
 * `git pull` - this is always good to run after you verify you are on main. It will pull down any changes since the last time you ran an analysis.
 
