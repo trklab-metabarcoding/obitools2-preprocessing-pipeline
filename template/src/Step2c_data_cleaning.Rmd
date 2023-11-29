@@ -10,7 +10,7 @@ output:
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, beepr)
 ```
 
 Now that you've inspected all the controls and potentially bad samples, and moved them out of the working folder, we rerun the merging steps and clean the final merged data set.
@@ -23,6 +23,7 @@ cd $merged_path
 
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 obicount all.uniq.fasta --without-progress-bar
+beep()
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers

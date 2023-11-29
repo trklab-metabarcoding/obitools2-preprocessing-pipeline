@@ -12,7 +12,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, beepr)
 ```
 
 #### Set up standard path variables
@@ -48,6 +48,7 @@ ecotag -d ${global_ref_db} -R ${ref_seq} ${cleaned_obitools_fasta} > ${DATE}_all
 
 #Count number of sequences in your file
 obicount ${DATE}_alluniq.clean.tag.fasta --without-progress-bar
+beep()
 ```
 
 Un-useful attributes can be removed from sequences

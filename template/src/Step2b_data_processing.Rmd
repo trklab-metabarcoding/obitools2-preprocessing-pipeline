@@ -10,15 +10,21 @@ output:
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, beepr)
 ```
 
 #### Set up Conda env for OBITools
 
 ```{bash, install obitools, eval = FALSE, echo = FALSE}
-# this only needs to be run once => skip if you have already created this in a prior analysis
 source ~/.bash_profile
-conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7
+
+if conda info --envs | grep -q obitools-env
+then 
+  echo "obitools-env already exists" 
+else 
+  conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7 
+fi
+
 ```
 
 #### Merge Illumina forward and reverse reads
@@ -37,6 +43,7 @@ do
     
     obicount ${sample}_merged.fastq
 done
+beep(1) #try integers 1-11 for different sounds #(https://www.r-project.org/nosvn/pandoc/beepr.html)
 
 ```
 
@@ -87,6 +94,7 @@ cd $merged_path
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 
 obicount all.uniq.fasta --without-progress-bar
+beep()
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
