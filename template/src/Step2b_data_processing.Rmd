@@ -43,10 +43,12 @@ do
     
     obicount ${sample}_merged.fastq
 done
-beep(1) #try integers 1-11 for different sounds #(https://www.r-project.org/nosvn/pandoc/beepr.html)
-
 ```
 
+```{r}
+beep(1) #audio notification upon process completion
+#try integers 1-11 for different sounds #(https://www.r-project.org/nosvn/pandoc/beepr.html)
+```
 #### Filter out unaligned reads
 ```{bash}
 source ~/.bash_profile
@@ -94,7 +96,10 @@ cd $merged_path
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 
 obicount all.uniq.fasta --without-progress-bar
-beep()
+```
+
+```{r}
+beep() # audio notification upon completion
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers

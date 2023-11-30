@@ -48,7 +48,6 @@ ecotag -d ${global_ref_db} -R ${ref_seq} ${cleaned_obitools_fasta} > ${DATE}_all
 
 #Count number of sequences in your file
 obicount ${DATE}_alluniq.clean.tag.fasta --without-progress-bar
-beep()
 ```
 
 Un-useful attributes can be removed from sequences
