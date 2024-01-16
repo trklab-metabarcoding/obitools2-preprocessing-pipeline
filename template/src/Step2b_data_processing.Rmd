@@ -10,7 +10,7 @@ output:
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, beepr)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 ```
 
 #### Set up Conda env for OBITools
@@ -24,7 +24,6 @@ then
 else 
   conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7 
 fi
-
 ```
 
 #### Merge Illumina forward and reverse reads
@@ -45,10 +44,6 @@ do
 done
 ```
 
-```{r}
-beep(1) #audio notification upon process completion
-#try integers 1-11 for different sounds #(https://www.r-project.org/nosvn/pandoc/beepr.html)
-```
 #### Filter out unaligned reads
 ```{bash}
 source ~/.bash_profile
@@ -96,10 +91,6 @@ cd $merged_path
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 
 obicount all.uniq.fasta --without-progress-bar
-```
-
-```{r}
-beep() # audio notification upon completion
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers

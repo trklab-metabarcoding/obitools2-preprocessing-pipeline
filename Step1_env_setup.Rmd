@@ -18,14 +18,14 @@ params:
     clean_threshold: 0.05 # -r in obiclean
     matching_score: 40 # --score-min in illuminapairedend
     #cutadapt params
-    primer_mismatch: 2
+    primer_mismatch: 3
     F_primer: "GGGCAATCCTGAGCCAA" # update to match your primer set
     R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
 ### Environment Setup
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, beepr)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 here::i_am("Step1_env_setup.Rmd")
 ```
 

@@ -62,7 +62,6 @@ then
 else 
   conda create -y -n cutadaptenv -c conda-forge -c bioconda cutadapt python=3.9 
 fi
-
 ```
 
 ```{bash}
