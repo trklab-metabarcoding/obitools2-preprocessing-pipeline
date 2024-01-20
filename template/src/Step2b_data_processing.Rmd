@@ -16,9 +16,14 @@ pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 #### Set up Conda env for OBITools
 
 ```{bash, install obitools, eval = FALSE, echo = FALSE}
-# this only needs to be run once => skip if you have already created this in a prior analysis
 source ~/.bash_profile
-conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7
+
+if conda info --envs | grep -q obitools-env
+then 
+  echo "obitools-env already exists" 
+else 
+  conda create -n obitools-env -y -c conda-forge -c bioconda obitools ecoprimers ecopcr python=2.7 
+fi
 ```
 
 #### Merge Illumina forward and reverse reads
@@ -37,7 +42,6 @@ do
     
     obicount ${sample}_merged.fastq
 done
-
 ```
 
 #### Filter out unaligned reads

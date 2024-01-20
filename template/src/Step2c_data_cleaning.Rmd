@@ -66,7 +66,8 @@ obigrep -l $min_read_length -L $max_read_length -p 'count>=2' all.uniq.fasta > $
 ```
 
 #### Clean the sequences for PCR/sequencing errors (sequence variants)
-We keep the head sequences (-H option) that are sequences with no variants with a count greater than 5% of their own count (-r 0.05 option).
+We keep the head sequences (-H option) that are sequences with no variants with a count greater than 5% of their own count (-r 0.05 option). 
+**Note:**This step takes a while.
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
