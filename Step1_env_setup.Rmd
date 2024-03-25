@@ -10,7 +10,7 @@ output:
 params:
     datetime: !r (format(Sys.time(), "%Y%m%d_%H:%M"))
     user: !r Sys.getenv("LOGNAME")
-    seq_dates: 2022-10-13, 2023-05-09
+    samples_path: "./data"
   
     #obitools params
     min_read_count: 1000
@@ -46,9 +46,10 @@ Copy over the folders inside `template/test_data` to `template/data` and save as
 dir.create(here(params$datetime))
 work_dir <- file.path(here(params$datetime))
 
-output_path <- file.path(here(work_dir, "results"))
-merged_path <- file.path(here(output_path, "merged"))
-bad_controls_path <- file.path(here(output_path, "bad_control_samples"))
+output_path <- file.path(here(work_dir, "all_results"))
+dir.create(output_path)
+dir.create(merged_path)
+
 sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = c("numeric", "text", "text", "text", "text", "text", "text", "text", "text", "date", "date", "date", "text"))
 ```
 
@@ -75,7 +76,7 @@ for (j in seq_along(sequencing_dates)){
   dir.create(file.path(here(work_dir, sequencing_dates[j], "results/bad_controls_path")))
 }
 
-seq_date_dirs <-dir(file.path(here(work_dir)), pattern="^\\d{4}-\\d{2}-\\d{2}", full.names=TRUE)
+seq_date_dirs <- dir(file.path(here(work_dir)), pattern="^\\d{4}-\\d{2}-\\d{2}", full.names=TRUE)
 
 for (k in seq_along(seq_date_dirs)){
   dir_copy(here("template/src/per_run"), seq_date_dirs[k], overwrite=TRUE)
@@ -112,7 +113,7 @@ R_primer_reverse
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(user=params$user)
 Sys.setenv(output_path=output_path)
-Sys.setenv(merged_path=merged_path)
+Sys.setenv(samples_path=params$samples_path)
 Sys.setenv(F_primer=params$F_primer)
 Sys.setenv(R_primer=params$R_primer)
 Sys.setenv(F_primer_reverse = F_primer_reverse)
