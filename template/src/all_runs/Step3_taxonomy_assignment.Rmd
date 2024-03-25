@@ -21,7 +21,7 @@ Here, you want to enter the folder name that you created during Step2
 
 ```{r}
 DATETIME <-params$datetime
-DATE<- str_extract(DATETIME, "[^_]+") #edit DATETIME to match the analysis folder name that was created when running step2, if not still saved in your R environmnet
+DATE<- str_extract(DATETIME, "[^_]+") #edit DATETIME to match the analysis folder name that was created when running step2, if not still saved in your R environment
 FILE_NAME<-sprintf("%s_alluniq.clean.fasta", DATE) #edit the YYYYMMDD to match the date of the file you created at the end of step2 in the "merged_path" directory.
 
 cleaned_obitools_fasta<-file.path(here("all_results", FILE_NAME)) #should not need to edit this code as it pulls the date and file name you set in the previous 2 lines of code

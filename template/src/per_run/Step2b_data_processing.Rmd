@@ -145,15 +145,16 @@ control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merge
 
 Add all of the `*id.fastq` files you want to move to the list named `bad_samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
 ```{r}
-##uncomment line 151 below if you have bad samples to move
 ##EXAMPLE: here("results/merged", c("results/merged/YNP218_S1_id.fastq", "results/merged/YNP297_S13_id.fastq"))
 
-#bad_samples_to_move <- here("results/merged", c("", "")
+bad_samples_to_move <- here("results/merged", c("", ""))
 ```
 
 ```{r}
-move_files(control_files, "../bad_controls_path", overwrite = FALSE)
-move_files(bad_samples_to_move, "../bad_controls_path", overwrite = FALSE)
+##uncomment line 157 below if you have bad samples to move
+
+move_files(control_files, here("results/bad_controls_path"), overwrite = FALSE)
+#move_files(bad_samples_to_move, here("results/bad_controls_path"), overwrite = FALSE)
 ```
 
 Let's also move this first data set to archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.
