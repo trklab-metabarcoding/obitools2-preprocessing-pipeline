@@ -8,10 +8,12 @@ output:
   df_print: paged
   toc: true
 params:
+    #don't change these
     datetime: !r (format(Sys.time(), "%Y%m%d_%H:%M"))
     user: !r Sys.getenv("LOGNAME")
     samples_path: "./data"
   
+    #do change params below this line as needed
     #obitools params
     min_read_count: 1000
     min_read_length: 8 # -l in obigrep
@@ -48,14 +50,13 @@ work_dir <- file.path(here(params$datetime))
 
 output_path <- file.path(here(work_dir, "all_results"))
 dir.create(output_path)
-dir.create(merged_path)
 
-sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = c("numeric", "text", "text", "text", "text", "text", "text", "text", "text", "date", "date", "date", "text"))
+sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = "text")
 ```
 
 #### Cleanup on data formats
 ```{r}
-sample_sheet %>%
+sample_sheet <- sample_sheet %>%
   mutate(across(contains("date"), ~ ymd(.)))
 ```
 
@@ -92,7 +93,7 @@ seq_date_names <- data.frame(sample_sheet %>% group_by(Folder) %>% summarise(val
 seq_date_names$value <- ymd(seq_date_names$value)
 
 for (m in seq_along(folders)){
-  from = file.path(here("template/data", folders[m]))
+  from = file.path(here("data", folders[m]))
   to = file.path(here(work_dir, seq_date_names$value[m]), "data")
   dir_copy(from, to, overwrite=TRUE)
 }
@@ -119,5 +120,3 @@ Sys.setenv(R_primer=params$R_primer)
 Sys.setenv(F_primer_reverse = F_primer_reverse)
 Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```
-
-**Note:** View your `sample_sheet` to make sure all the dates are displayed as `yyyy-mm-dd`. If you see NAs, go back to the `xlsx` form and enter them either as `mm/dd/yyyy` or `mm-dd-yyyy` format.
