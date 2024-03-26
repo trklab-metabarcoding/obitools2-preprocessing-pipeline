@@ -10,6 +10,7 @@ output:
 params:
     datetime: !r (format(Sys.time(), "%Y%m%d_%H:%M"))
     user: !r Sys.getenv("LOGNAME")
+    seq_dates: 2022-10-13, 2023-05-09
   
     #obitools params
     min_read_count: 1000
@@ -22,10 +23,11 @@ params:
     F_primer: "GGGCAATCCTGAGCCAA" # update to match your primer set
     R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
+
 ### Environment Setup
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate, fs)
 here::i_am("Step1_env_setup.Rmd")
 ```
 
@@ -38,17 +40,16 @@ do.call('Sys.setenv', params)
 #### Set up standard path variables
 
 **Note:** When using the provided test data for training:
-Update the `samples_path` to `here(params$datetime, "test_data")` if using your own data and the `sample_sheet` to `here("sample_sheet_test.xlsx")`. Also update the path in the file copy (line 66) to `from=here("test_data")`. Similarly, update the path in the file copy (line 67) to `from=here("sample_sheet_test.xlsx")`.
+Copy over the folders inside `template/test_data` to `template/data` and save as copy of `sample_sheet_test.xlsx` as `sample_sheet.xlsx`!
 
 ```{r}
 dir.create(here(params$datetime))
 work_dir <- file.path(here(params$datetime))
-src_path <- file.path(here(params$datetime, "src"))
-samples_path <- file.path(here(params$datetime, "data")) # edit to use your own data, see text above
-output_path <- file.path(here(params$datetime, "results"))
-merged_path <- file.path(here(params$datetime, "results/merged"))
-bad_controls_path <- file.path(here(params$datetime, "results/bad_control_samples"))
-sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess") # edit to use the test data, see text above
+
+output_path <- file.path(here(work_dir, "results"))
+merged_path <- file.path(here(output_path, "merged"))
+bad_controls_path <- file.path(here(output_path, "bad_control_samples"))
+sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = c("numeric", "text", "text", "text", "text", "text", "text", "text", "text", "date", "date", "date", "text"))
 ```
 
 #### Cleanup on data formats
@@ -57,14 +58,45 @@ sample_sheet %>%
   mutate(across(contains("date"), ~ ymd(.)))
 ```
 
+The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
+```{r}
+extraction_date <- unique(sample_sheet$`Ext date`)
+pcr_date <- unique(sample_sheet$`PCR date`)
+sequencing_dates <- unique(sample_sheet$`Seq date`)
+folders <- unique(sample_sheet$Folder)
+```
+
+Next create a folder for results for each sequencing date in the sample sheet.
+```{r}
+for (j in seq_along(sequencing_dates)){
+  dir.create(file.path(here(work_dir, sequencing_dates[j])))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results")))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results/merged")))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results/bad_controls_path")))
+}
+
+seq_date_dirs <-dir(file.path(here(work_dir)), pattern="^\\d{4}-\\d{2}-\\d{2}", full.names=TRUE)
+
+for (k in seq_along(seq_date_dirs)){
+  dir_copy(here("template/src/per_run"), seq_date_dirs[k], overwrite=TRUE)
+}
+
+dir_copy(here("template/src/all_runs"), work_dir, overwrite=TRUE)
+```
+
 #### Copy over data and sample sheet
 ```{r}
-dir.create(output_path)
-dir.create(merged_path)
-dir.create(bad_controls_path)
-file.copy(from=here("template/src"), to=here(params$datetime), recursive=TRUE)
-file.copy(from=here("template/data"), to=here(params$datetime), recursive=TRUE)
-file.copy(from=here("sample_sheet.xlsx"), to=here(params$datetime))
+seq_date_names <- data.frame(sample_sheet %>% group_by(Folder) %>% summarise(value = unique(`Seq date`)))
+
+seq_date_names$value <- ymd(seq_date_names$value)
+
+for (m in seq_along(folders)){
+  from = file.path(here("template/data", folders[m]))
+  to = file.path(here(work_dir, seq_date_names$value[m]), "data")
+  dir_copy(from, to, overwrite=TRUE)
+}
+
+file.copy(from=here("sample_sheet.xlsx"), to=here(work_dir))
 ```
 
 #### Generate some derived parameters from the inputs
@@ -79,10 +111,8 @@ R_primer_reverse
 ```{r}
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(user=params$user)
-Sys.setenv(samples_path=samples_path)
 Sys.setenv(output_path=output_path)
 Sys.setenv(merged_path=merged_path)
-Sys.setenv(src_path=src_path)
 Sys.setenv(F_primer=params$F_primer)
 Sys.setenv(R_primer=params$R_primer)
 Sys.setenv(F_primer_reverse = F_primer_reverse)

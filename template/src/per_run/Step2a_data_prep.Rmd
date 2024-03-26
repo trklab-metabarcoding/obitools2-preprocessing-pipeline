@@ -16,20 +16,12 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 ```
 
-The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
-
-```{r}
-extraction_date <- as.list(unique(sample_sheet$`Ext date`))
-pcr_date <- as.list(unique(sample_sheet$`PCR date`))
-sequencing_date <- as.list(unique(sample_sheet$`Seq date`))
-```
-
 #### Rename files with project-specific sample names
 
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
-file_names_original <- list.files(samples_path, pattern=".gz", full.names = T)
+file_names_original <- list.files(samples_path, pattern=".gz", full.names = T, recursive = T)
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
