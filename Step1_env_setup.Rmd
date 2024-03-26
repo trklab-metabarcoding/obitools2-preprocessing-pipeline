@@ -25,7 +25,7 @@ params:
 ### Environment Setup
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate)
 here::i_am("Step1_env_setup.Rmd")
 ```
 
@@ -36,23 +36,37 @@ do.call('Sys.setenv', params)
 ```
 
 #### Set up standard path variables
-Update the `samples_path` to `here(params$datetime, "data")` if using your own data and the `sample_sheet` to `here("sample_sheet.xlsx")`. Also reduce the from path in the file copy (line 53) to just `from=here("data")`. Similarly, reduce the from path in the file copy (line 54) to just `from=here("sample_sheet.xlsx")`.
+
+**Note:** When using the provided test data for training:
+Update the `samples_path` to `here(params$datetime, "test_data")` if using your own data and the `sample_sheet` to `here("sample_sheet_test.xlsx")`. Also update the path in the file copy (line 66) to `from=here("test_data")`. Similarly, update the path in the file copy (line 67) to `from=here("sample_sheet_test.xlsx")`.
+
 ```{r}
 dir.create(here(params$datetime))
 work_dir <- file.path(here(params$datetime))
 src_path <- file.path(here(params$datetime, "src"))
-samples_path <- file.path(here(params$datetime, "test_data")) # edit to use your own data, see text above
+samples_path <- file.path(here(params$datetime, "data")) # edit to use your own data, see text above
 output_path <- file.path(here(params$datetime, "results"))
 merged_path <- file.path(here(params$datetime, "results/merged"))
 bad_controls_path <- file.path(here(params$datetime, "results/bad_control_samples"))
-sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess") # edit to use your own data, see text above
+sample_sheet <- read_xlsx(here("sample_sheet_test.xlsx"), col_types = "guess") # edit to use the test data, see text above
+```
+
+#### Cleanup on data formats
+```{r}
+sample_sheet %>%
+  mutate(across(contains("date"), ~ ymd(.)))
+```
+
+#### Copy over data and sample sheet
+```{r}
 dir.create(output_path)
 dir.create(merged_path)
 dir.create(bad_controls_path)
 file.copy(from=here("template/src"), to=here(params$datetime), recursive=TRUE)
-file.copy(from=here("template/test_data"), to=here(params$datetime), recursive=TRUE)
-file.copy(from=here("sample_sheet_test.xlsx"), to=here(params$datetime))
+file.copy(from=here("template/data"), to=here(params$datetime), recursive=TRUE)
+file.copy(from=here("sample_sheet.xlsx"), to=here(params$datetime))
 ```
+
 #### Generate some derived parameters from the inputs
 
 ```{r}
@@ -61,6 +75,7 @@ R_primer_reverse <- reverseComplement(params$R_primer)
 F_primer_reverse 
 R_primer_reverse
 ```
+
 ```{r}
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(user=params$user)
@@ -73,3 +88,5 @@ Sys.setenv(R_primer=params$R_primer)
 Sys.setenv(F_primer_reverse = F_primer_reverse)
 Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```
+
+**Note:** View your `sample_sheet` to make sure all the dates are displayed as `yyyy-mm-dd`. If you see NAs, go back to the `xlsx` form and enter them either as `mm/dd/yyyy` or `mm-dd-yyyy` format.

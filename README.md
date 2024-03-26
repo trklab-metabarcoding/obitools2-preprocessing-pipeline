@@ -16,19 +16,17 @@ There are three ways to interact with Oscar:
 Option #1 is recommended for this use case, and allows us to choose a newer version of R.
 
 - [ ] If not on campus, make sure you are connected to the Brown [VPN](https://it.brown.edu/services/virtual-private-network-vpn)
-- [ ] Navigate to the link in #1 and choose R version 4.2.0.
-- [ ] Under Modules put `git/2.29.2 anaconda/2022.05`.
+- [ ] Navigate to the link in #1 and choose R version 4.3.1.
+- [ ] Under Modules put `git miniconda3`.
 - [ ] Launch the session once it has been allocated. 
 - [ ] Go to the terminal pane in RStudio and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
-- [ ] In that terminal `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
+- [ ] In that terminal `git clone https://github.com/trklab-metabarcoding/obitools2-pipeline.git`
 - [ ] Also in the terminal: `cd obitools2-pipeline`
 - [ ] In the Files panes of RStudio, use the menu at the top right to make sure you are also at the same path.
 - [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
 ![Rproj example](images/Rproj-example.png)
 
 **Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
-
-**Note:** If Conda is not found when running code chunks, add this line to your `.bash_profile` in your home directory on Oscar: `export PATH=~/gpfs/runtime/opt/anaconda/2022.05/bin:$PATH`
 
 ## Workflow structure
 
@@ -46,7 +44,12 @@ The easiest way to copy over your data is through the SMB client in your local M
 
 - `cd <your_folder>/obitools2-pipeline/template/data`; now drag and drop your files from local. They will get copied over into a dated folder.
 
-Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the headers and make a `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo.
+**Note:** The pipeline expects all the `.gz` file pairs in the `template/data` folder. If you dragged over parent folders with `.gz` inside each folder, run the following to move the files:
+  `cd template/data`  #switch terminal location to the data folder
+  `mv **/*.gz .`  #this moves the files out of the run folders
+  `find . -type d -empty -delete`. #this will delete the now empty folders
+
+Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the headers and make a `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in mm/dd/yyyy format.
 
 ## Running the Notebooks
 
