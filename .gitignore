@@ -6,7 +6,6 @@
 2023*
 2024*
 2025*
-template/data/*/*.gz
-sample_sheet.xlsx
+data/*/*.gz
 *.html
 sampleNames
