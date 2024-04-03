@@ -14,7 +14,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
-here::i_am("Step2a_data_prep.Rmd")
+here::i_am("./Step2a_data_prep.Rmd")
 ```
 
 #### Rename files with project-specific sample names
