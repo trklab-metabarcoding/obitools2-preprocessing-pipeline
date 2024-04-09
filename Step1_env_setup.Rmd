@@ -30,7 +30,7 @@ params:
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate, fs)
-here::i_am("Step1_env_setup.Rmd")
+here::i_am("./Step1_env_setup.Rmd")
 ```
 
 ```{r setup, include=FALSE}
@@ -58,6 +58,9 @@ sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = "text")
 ```{r}
 sample_sheet <- sample_sheet %>%
   mutate(across(contains("date"), ~ ymd(.)))
+
+sample_sheet$SampleName <- as.character(sample_sheet$SampleName)
+sample_sheet$SampleID <- as.character(sample_sheet$SampleID)
 ```
 
 The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.

@@ -49,7 +49,9 @@ conda activate /users/${user}/.conda/envs/obitools-env
 cd $output_path
 
 # get the counting statistics on the ‘count’ attribute
-obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t
+{
+obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t 
+} | tee -a seq_count_table_no_controls.txt
 ```
 
 #### Create a tabulated file for counts per sequence read
