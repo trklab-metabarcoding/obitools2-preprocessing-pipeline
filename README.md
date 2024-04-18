@@ -44,11 +44,12 @@ The main folders in this repository are:
 The easiest way to copy over your data is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
 ![smb_example](images/smb_example.png)
 
-- In the Finder window, `<your_repo_path>/obitools2-pipeline/data`; now drag and drop your files from local. They will get copied over into a dated working folder after running Step1.
+- Data should be in the common `projects` folder at `/oscar/data/tkartzin/projects`. The permissions at this location are limited to trklab people.
+- In the Finder window, drag and drop your folders of files from local. They will get copied over into a dated working folder in your pipeline after running Step1.
 
-**Note:** The pipeline expects all the `.gz` file pairs in folders that correspond to each sequencing date in the `data` folder. Drag over parent folders with `.gz` inside each folder and the pipeline will rename by sequencing date, according to your sample sheet.
+**Note:** The pipeline expects all the `.gz` file pairs in folders that correspond to each sequencing date specified in the sample sheet. Drag over parent folders with `.gz` inside each folder and the pipeline will rename by sequencing date, according to your sample sheet.
 
-Take a look at the `template/sample_sheet_test.xlsx` while you have SMB mounted; fill out `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
+Take a look at the `template/sample_sheet_blank.xlsx` while you have SMB mounted; fill out `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
 
 ## Running the Notebooks
 
