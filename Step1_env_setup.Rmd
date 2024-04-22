@@ -11,9 +11,10 @@ params:
     #don't change these
     datetime: !r (format(Sys.time(), "%Y%m%d_%H:%M"))
     user: !r Sys.getenv("LOGNAME")
-    samples_path: "./data"
+    data_path: "/oscar/data/tkartzin/projects"
   
     #do change params below this line as needed
+    project_code: "test"
     #obitools params
     min_read_count: 1000
     min_read_length: 8 # -l in obigrep
@@ -42,7 +43,7 @@ do.call('Sys.setenv', params)
 #### Set up standard path variables
 
 **Note:** When using the provided test data for training:
-Copy over the folders inside `template/test_data` to `template/data` and save as copy of `sample_sheet_test.xlsx` as `sample_sheet.xlsx`!
+Make sure you set the `project_code` param in the YAML to "test" and save as copy of `sample_sheet_test.xlsx` as `sample_sheet.xlsx`!
 
 ```{r}
 dir.create(here(params$datetime))
@@ -75,6 +76,7 @@ Next create a folder for results for each sequencing date in the sample sheet.
 ```{r}
 for (j in seq_along(sequencing_dates)){
   dir.create(file.path(here(work_dir, sequencing_dates[j])))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "data")))
   dir.create(file.path(here(work_dir, sequencing_dates[j], "results")))
   dir.create(file.path(here(work_dir, sequencing_dates[j], "results/merged")))
   dir.create(file.path(here(work_dir, sequencing_dates[j], "results/bad_controls_path")))
@@ -91,12 +93,14 @@ dir_copy(here("template/src/all_runs"), work_dir, overwrite=TRUE)
 
 #### Copy over data and sample sheet
 ```{r}
+samples_path = file.path(params$data_path, params$project_code)
+
 seq_date_names <- data.frame(sample_sheet %>% group_by(Folder) %>% summarise(value = unique(`Seq date`)))
 
 seq_date_names$value <- ymd(seq_date_names$value)
 
 for (m in seq_along(folders)){
-  from = file.path(here("data", folders[m]))
+  from = file.path(samples_path, folders[m])
   to = file.path(here(work_dir, seq_date_names$value[m]), "data")
   dir_copy(from, to, overwrite=TRUE)
 }
@@ -117,7 +121,7 @@ R_primer_reverse
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(user=params$user)
 Sys.setenv(output_path=output_path)
-Sys.setenv(samples_path=params$samples_path)
+Sys.setenv(samples_path=samples_path)
 Sys.setenv(F_primer=params$F_primer)
 Sys.setenv(R_primer=params$R_primer)
 Sys.setenv(F_primer_reverse = F_primer_reverse)
