@@ -14,7 +14,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
-here::i_am("./Step2a_data_prep.Rmd")
+here::i_am("./Step2b_data_prep.Rmd")
 ```
 
 #### Rename files with project-specific sample names
@@ -22,7 +22,7 @@ here::i_am("./Step2a_data_prep.Rmd")
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
-file_names_original <- list.files(params$samples_path, pattern=".gz", full.names = T, recursive = T)
+file_names_original <- list.files(samples_path, pattern=".gz", full.names = T, recursive = T)
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
