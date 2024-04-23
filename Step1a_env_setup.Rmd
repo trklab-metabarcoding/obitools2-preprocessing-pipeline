@@ -1,5 +1,5 @@
 ---
-title: "Step2a_environment_setup"
+title: "Step1a_environment_setup"
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
@@ -32,7 +32,7 @@ params:
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate, fs)
-here::i_am("./Step2a_env_setup.Rmd")
+here::i_am("./Step1a_env_setup.Rmd")
 ```
 
 ```{r setup, include=FALSE}

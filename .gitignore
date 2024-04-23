@@ -9,3 +9,4 @@
 data/*/*.gz
 *.html
 sampleNames
+sample_sheet.xlsx
