@@ -1,5 +1,5 @@
 ---
-title: "Step 2b - data preparation"
+title: "Step 1b - data preparation"
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
@@ -17,7 +17,7 @@ pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, f
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("qckitfastq")
-here::i_am("./Step2b_data_prep.Rmd")
+here::i_am("./Step1b_data_prep.Rmd")
 ```
 
 #### Rename files with project-specific sample names

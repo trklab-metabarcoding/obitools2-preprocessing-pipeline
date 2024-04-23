@@ -1,5 +1,5 @@
 ---
-title: "Step2b_data_processing"
+title: "Step1c_data_processing"
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
@@ -11,7 +11,7 @@ output:
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
-here::i_am("./Step2b_data_processing.Rmd")
+here::i_am("./Step1c_data_processing.Rmd")
 ```
 
 #### Set up Conda env for OBITools
