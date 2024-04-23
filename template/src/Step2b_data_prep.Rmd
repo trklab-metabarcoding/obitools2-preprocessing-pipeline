@@ -1,5 +1,5 @@
 ---
-title: "Step 2a - data preparation"
+title: "Step 2b - data preparation"
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
@@ -13,15 +13,11 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
-```
-
-The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
-
-```{r}
-extraction_date <- as.list(unique(sample_sheet$`Ext date`))
-pcr_date <- as.list(unique(sample_sheet$`PCR date`))
-sequencing_date <- as.list(unique(sample_sheet$`Seq date`))
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, fastqcr)
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("qckitfastq")
+here::i_am("./Step2b_data_prep.Rmd")
 ```
 
 #### Rename files with project-specific sample names
@@ -29,7 +25,7 @@ sequencing_date <- as.list(unique(sample_sheet$`Seq date`))
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
-file_names_original <- list.files(samples_path, pattern=".gz", full.names = T)
+file_names_original <- list.files(samples_path, pattern=".gz", full.names = T, recursive = T)
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
@@ -43,8 +39,19 @@ control_samples <- unique(control_samples$SampleID)
 ```
 
 ```{r}
-capture.output(control_samples, file = here(params$datetime, 'results/control_list.txt'))
-capture.output(file_names, file = here(params$datetime, 'results/file_names.txt'))
+capture.output(control_samples, file = here('results/control_list.txt'))
+capture.output(file_names, file = here('results/file_names.txt'))
+```
+
+#### TODO: Generate FastQC report and plots
+```{r}
+#dir.create(here("fastqc"))
+#fastqc(fq.dir = here("data"), qc.dir = here("fastqc"), threads = 4)
+
+#for (file in seq_along(field_name)) {
+#  folder <- dir.create(file.path(here(work_dir, "fastqc", field_name[file])))
+  #qckitfastq::run_all(file, folder)
+
 ```
 
 #### Trim primers with Cutadapt
@@ -65,12 +72,12 @@ fi
 ```
 
 ```{bash}
-cd $samples_path
+cd ./data
 ls *_R1_001.fastq.gz | cut -f1-2 -d "_" > sampleNames
 ```
 
 ```{bash}
-cd $samples_path
+cd ./data
 cat sampleNames
 ```
 
@@ -84,10 +91,10 @@ do
 
     echo "On sample: $sample"
   
-    cutadapt -a ^$F_primer...$R_primer_reverse -A ^$R_primer...$R_primer_reverse --no-indels -e $primer_mismatch --discard-untrimmed -o ${sample}_L001_R1_001_trimmed.fastq.gz -p ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001.fastq.gz ${sample}_L001_R2_001.fastq.gz >> $output_path/cutadapt_primer_trimming_stats.txt 2>&1
+    cutadapt -a ^$F_primer...$R_primer_reverse -A ^$R_primer...$R_primer_reverse --no-indels -e $primer_mismatch --discard-untrimmed -o ${sample}_L001_R1_001_trimmed.fastq.gz -p ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001.fastq.gz ${sample}_L001_R2_001.fastq.gz >> ../results/cutadapt_primer_trimming_stats.txt 2>&1
 done
 
-mv *trimmed.fastq.gz $output_path
+mv *trimmed.fastq.gz ../results
 ```
 Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
 
@@ -95,7 +102,7 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
 
-paste $samples_path/sampleNames <(grep "passing" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" $output_path/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
+paste ./data/sampleNames <(grep "passing" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt

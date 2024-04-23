@@ -13,6 +13,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
+here::i_am("./Step3_taxonomy_assignment.Rmd")
 ```
 
 #### Set up standard path variables
@@ -20,14 +21,14 @@ Here, you want to enter the folder name that you created during Step2
 
 ```{r}
 DATETIME <-params$datetime
-DATE<- str_extract(DATETIME, "[^_]+") #edit YYYY-MM-DD to match the analysis folder name that was created when running step2
+DATE<- str_extract(DATETIME, "[^_]+") #edit DATETIME to match the analysis folder name that was created when running step2, if not still saved in your R environment
 FILE_NAME<-sprintf("%s_alluniq.clean.fasta", DATE) #edit the YYYYMMDD to match the date of the file you created at the end of step2 in the "merged_path" directory.
 
-cleaned_obitools_fasta<-file.path(here(DATETIME, "results/merged", FILE_NAME)) #should not need to edit this code as it pulls the date and file name you set in the previous 2 lines of code
+cleaned_obitools_fasta<-file.path(here("all_results", FILE_NAME)) #should not need to edit this code as it pulls the date and file name you set in the previous 2 lines of code
 
-global_ref_db<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/embl_r143") #-d in ecotag; ecoPCR taxonomy Database name. Need to edit YYYYMMDD and name of taxonomy database to match that of the most recent global reference library you want to use.
+global_ref_db<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/YYYYMMDD_ecoPCRformat") #-d in ecotag; ecoPCR taxonomy Database name. Need to edit YYYYMMDD and name of taxonomy database to match that of the most recent global reference library you want to use.
 
-ref_seq<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/db_P6_r143.fasta") #-R in ecotag; fasta file containing the reference sequences. Need to edit YYYYMMDD and name of fasta file to match that of the most recent global reference library you want to use. 
+ref_seq<-file.path("/oscar/data/tkartzin/global_ref_lib_plants/YYYYMMDD/db_YYYYMMDD_P6set.fasta") #-R in ecotag; fasta file containing the reference sequences. Need to edit YYYYMMDD and name of fasta file to match that of the most recent global reference library you want to use. 
 ```
 
 ```{r}
@@ -42,7 +43,7 @@ Sys.setenv(DATE=DATE)
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd $merged_path
+cd $output_path
 
 ecotag -d ${global_ref_db} -R ${ref_seq} ${cleaned_obitools_fasta} > ${DATE}_alluniq.clean.tag.fasta
 
@@ -54,15 +55,15 @@ Un-useful attributes can be removed from sequences
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd $merged_path
+cd $output_path
 
 obiannotate --delete-tag=scientific_name_by_db --delete-tag=obiclean_samplecount \
   --delete-tag=obiclean_count --delete-tag=obiclean_singletoncount \
   --delete-tag=obiclean_cluster --delete-tag=obiclean_internalcount \
   --delete-tag=obiclean_head --delete-tag=taxid_by_db --delete-tag=obiclean_headcount \
   --delete-tag=id_status --delete-tag=rank_by_db --delete-tag=order_name \
-  --delete-tag=order ${merged_path}/${DATE}_alluniq.clean.tag.fasta > \
-  ${merged_path}/${DATE}_alluniq.clean.tag.ann.fasta
+  --delete-tag=order ${output_path}/${DATE}_alluniq.clean.tag.fasta > \
+  ${output_path}/${DATE}_alluniq.clean.tag.ann.fasta
 
 #count number of sequences in file (should match above)
 obicount -a ${DATE}_alluniq.clean.tag.ann.fasta --without-progress-bar
@@ -73,7 +74,7 @@ This is your final OBITools output (resembles a large ASV/OTU table) that can be
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd $merged_path
+cd $output_path
 
 obitab -o ${DATE}_alluniq.clean.tag.ann.fasta > ${DATE}_alluniq.clean.tag.ann.tab
 ```

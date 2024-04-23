@@ -16,11 +16,11 @@ There are three ways to interact with Oscar:
 Option #1 is recommended for this use case, and allows us to choose a newer version of R.
 
 - [ ] If not on campus, make sure you are connected to the Brown [VPN](https://it.brown.edu/services/virtual-private-network-vpn)
-- [ ] Navigate to the link in #1 and choose R version 4.2.0.
-- [ ] Under Modules put `git/2.29.2 anaconda/2022.05`.
+- [ ] Navigate to the link in #1 and choose R version 4.3.1.
+- [ ] Under Modules put `git miniconda3`.
 - [ ] Launch the session once it has been allocated. 
 - [ ] Go to the terminal pane in RStudio and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
-- [ ] In that terminal `git clone https://github.com/trklab-crisprsites/obitools2-pipeline.git`
+- [ ] In that terminal `git clone https://github.com/trklab-metabarcoding/obitools2-pipeline.git`
 - [ ] Also in the terminal: `cd obitools2-pipeline`
 - [ ] In the Files panes of RStudio, use the menu at the top right to make sure you are also at the same path.
 - [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
@@ -28,15 +28,15 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 
 **Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
 
-**Note:** If Conda is not found when running code chunks, add this line to your `.bash_profile` in your home directory on Oscar: `export PATH=~/gpfs/runtime/opt/anaconda/2022.05/bin:$PATH`
-
 ## Workflow structure
 
 The main folders in this repository are:
 - `images`: this is just for the images used in the README
+- `data`: this can be used to copy over your dataset
 - `template`: this contains `data`, `src`, and `test_data` folders
-  - `data`: this can be used to copy over your dataset
   - `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
+    - `per_run`: 2a and 2b are run for each sequencing run
+    - `all_runs` 2c and 3 are run once for the entire dataset
   - `test_data`: a simple dataset to use for learning the workflow
 
 ## Getting data into your workflow
@@ -44,9 +44,12 @@ The main folders in this repository are:
 The easiest way to copy over your data is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
 ![smb_example](images/smb_example.png)
 
-- `cd <your_folder>/obitools2-pipeline/template/data`; now drag and drop your files from local. They will get copied over into a dated folder.
+- Data should be in the common `projects` folder at `/oscar/data/tkartzin/projects`. The permissions at this location are limited to trklab people.
+- In the Finder window, drag and drop your folders of files from local. They will get copied over into a dated working folder in your pipeline after running Step1.
 
-Take a look at the `sample_sheet_test.xlsx` while you have SMB mounted; copy the headers and make a `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo.
+**Note:** The pipeline expects all the `.gz` file pairs in folders that correspond to each sequencing date specified in the sample sheet. Drag over parent folders with `.gz` inside each folder and the pipeline will rename by sequencing date, according to your sample sheet.
+
+Take a look at the `template/sample_sheet_blank.xlsx` while you have SMB mounted; fill out `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
 
 ## Running the Notebooks
 

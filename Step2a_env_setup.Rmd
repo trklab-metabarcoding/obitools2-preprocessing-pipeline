@@ -1,0 +1,129 @@
+---
+title: "Step2a_environment_setup"
+author: "T. Divoll"
+date: "2023-09-12"
+output: 
+  html_document:
+  keep_md: TRUE
+  df_print: paged
+  toc: true
+params:
+    #don't change these
+    datetime: !r (format(Sys.time(), "%Y%m%dT%H:%M:%SZ"))
+    user: !r Sys.getenv("LOGNAME")
+    data_path: "/oscar/data/tkartzin/projects"
+  
+    #do change params below this line as needed
+    project_code: "test"
+    
+    ##obitools params
+    min_read_count: 1000
+    min_read_length: 8 # -l in obigrep
+    max_read_length: 300 # -L in obigrep
+    clean_threshold: 0.05 # -r in obiclean
+    matching_score: 40 # --score-min in illuminapairedend
+    ##cutadapt params
+    primer_mismatch: 3
+    F_primer: "GGGCAATCCTGAGCCAA" # update to match your primer set
+    R_primer: "CCATTGAGTCTCTGCACCTATC"
+---
+
+### Environment Setup
+```{r include=FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate, fs)
+here::i_am("./Step2a_env_setup.Rmd")
+```
+
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE)
+do.call('Sys.setenv', params)
+```
+
+#### Set up standard path variables
+
+**Note:** When using the provided test data for training:
+Make sure you set the `project_code` param in the YAML to "test" and save as copy of `sample_sheet_test.xlsx` as `sample_sheet.xlsx`!
+
+```{r}
+dir.create(here(params$datetime))
+work_dir <- file.path(here(params$datetime))
+
+output_path <- file.path(here(work_dir, "all_results"))
+dir.create(output_path)
+
+sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = "text")
+```
+
+#### Cleanup on data formats
+```{r}
+sample_sheet <- sample_sheet %>%
+  mutate(across(contains("date"), ~ ymd(.)))
+
+sample_sheet$SampleName <- as.character(sample_sheet$SampleName)
+sample_sheet$SampleID <- as.character(sample_sheet$SampleID)
+```
+
+The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.
+```{r}
+extraction_date <- unique(sample_sheet$`Ext date`)
+pcr_date <- unique(sample_sheet$`PCR date`)
+sequencing_dates <- unique(sample_sheet$`Seq date`)
+folders <- unique(sample_sheet$Folder)
+```
+
+Next create a folder for results for each sequencing date in the sample sheet.
+```{r}
+for (j in seq_along(sequencing_dates)){
+  dir.create(file.path(here(work_dir, sequencing_dates[j])))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results")))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results/merged")))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results/bad_controls_path")))
+}
+
+seq_date_dirs <- dir(file.path(here(work_dir)), pattern="^\\d{4}-\\d{2}-\\d{2}", full.names=TRUE)
+
+for (k in seq_along(seq_date_dirs)){
+  dir_copy(here("template/src"), seq_date_dirs[k], overwrite=TRUE)
+}
+```
+
+#### Copy over data and sample sheet
+```{r}
+samples_path = file.path(params$data_path, params$project_code)
+
+seq_date_names <- data.frame(sample_sheet %>% group_by(Folder) %>% summarise(value = unique(`Seq date`)))
+
+seq_date_names$value <- ymd(seq_date_names$value)
+
+for (m in seq_along(folders)){
+  from = file.path(samples_path, folders[m])
+  to = file.path(here(work_dir, seq_date_names$value[m]))
+  dir_copy(from, to, overwrite=TRUE)
+  file.rename(from = file.path(to,"raw_data"), to = file.path(to, "data"))
+}
+
+file.copy(from=here("sample_sheet.xlsx"), to=here(work_dir))
+
+```
+
+#### Generate some derived parameters from the inputs
+
+```{r}
+F_primer_reverse <- reverseComplement(params$F_primer)
+R_primer_reverse <- reverseComplement(params$R_primer)
+F_primer_reverse 
+R_primer_reverse
+```
+
+```{r}
+## make environment variables that can be passed to bash code chunks
+Sys.setenv(user=params$user)
+Sys.setenv(output_path=output_path)
+Sys.setenv(samples_path=samples_path)
+Sys.setenv(F_primer=params$F_primer)
+Sys.setenv(R_primer=params$R_primer)
+Sys.setenv(F_primer_reverse = F_primer_reverse)
+Sys.setenv(R_primer_reverse = R_primer_reverse)
+```

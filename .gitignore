@@ -5,6 +5,8 @@
 .DS_Store
 2023*
 2024*
+2025*
+data/*/*.gz
 *.html
 sampleNames
 sample_sheet.xlsx
