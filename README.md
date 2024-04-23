@@ -1,4 +1,4 @@
-# obitools2-pipeline
+# obitools2-preprocessing-pipeline
 
 This repository contains the code to process metabarcoding data with OBITools v.1.2.12 on Brown's high-performance cluster, Oscar.
 The following steps provide guidance on connecting to an RStudio server on Oscar and running the interactive R Notebooks.
@@ -57,17 +57,17 @@ Take a look at the `template/sample_sheet_blank.xlsx` while you have SMB mounted
 The notebooks can be opened by double-clicking from the RStudio `Files` window.
 The first step is to update all of the `params` in the YAML header of the first notebook. 
 
-### 1. `Step1_env_setup.Rmd`
+### 1. `Step1a_env_setup.Rmd`
 This first notebook generates a new folder with today's date for you analysis, and copies over data, source notebooks, and the empty results folder.
 
 Run all from the drop-down menu to generate parameters and create environment variables.
 
 Next navigate to the `src` folder inside the new folder with today's date to view the analysis notebooks.
 
-### 2. `Step2a_data_prep.Rmd`
+### 2. `Step1b_data_prep.Rmd`
 The second notebook is where you set all of your parameters for trimming, filtering, primers, etc. This notebook also runs `cutadapt` to trim off primers.
 
-### 3. `Step2b_data_processing.Rmd`
+### 3. `Step1c_data_processing.Rmd`
 The third notebook filters files and merges all the reads into one file per sample. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis.
 
 ### 4. `Step2c_data_cleaning.Rmd`
