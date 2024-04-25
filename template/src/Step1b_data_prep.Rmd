@@ -85,7 +85,7 @@ cat sampleNames
 conda init bash
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
-cd $samples_path
+cd ./data
 for sample in $(cat sampleNames)
 do
 
@@ -112,4 +112,4 @@ source ~/.bash_profile
 conda deactivate
 ```
 
-Now navigate to the notebook `Step2b_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
+Now navigate to the notebook `Step1c_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
