@@ -13,10 +13,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, fastqcr)
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("qckitfastq")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 here::i_am("./Step1b_data_prep.Rmd")
 ```
 

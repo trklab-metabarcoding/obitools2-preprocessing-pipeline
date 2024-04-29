@@ -161,4 +161,26 @@ Let's also move this first data set to archive and we will re-run merging and de
 ```{r}
 move_files(c(here("results/merged", "all.uniq.fasta"), here("results/merged", "all.uniq.tab")), here("results/bad_controls_path"), overwrite = FALSE)
 ```
+
+Create an environment variable for the results destination path.
+```{r}
+DIR = basename(getwd())
+mapped_folder <- 
+  filter(seq_date_names, value == DIR)$Folder
+Sys.setenv(mapped_folder=mapped_folder)
+```
+
+Copy over your results folder and the Steps 1b and 1c notebooks to the shared lab directory on Oscar.
+**Note: Save this notebook first so any results are recorded before copying.**
+```{bash}
+source ~/.bash_profile
+conda activate /users/${user}/.conda/envs/obitools-env
+
+mkdir -p ${data_path}/${project_code}/${mapped_folder}/${DIR}
+cp -r results ${data_path}/${project_code}/${mapped_folder}/${DIR}
+cp *.Rmd ${data_path}/${project_code}/${mapped_folder}/${DIR}
+
+conda deactivate
+```
+
 Now navigate to the notebook `Step3a_data_cleaning.Rmd` in the `obitools2-taxonomy-assignment` [repository](https://github.com/trklab-metabarcoding/obitools2-taxonomy-assignment). Use the Files pane in RStudio to navigate to `/oscar/data/tkartzin/r'params$user'/obitools2-taxonomy-assignment`.
