@@ -50,9 +50,6 @@ Make sure you set the `project_code` param in the YAML to "test" and save as cop
 dir.create(here(params$datetime))
 work_dir <- file.path(here(params$datetime))
 
-output_path <- file.path(here(work_dir, "all_results"))
-dir.create(output_path)
-
 sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = "text")
 ```
 
@@ -120,7 +117,6 @@ R_primer_reverse
 ```{r}
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(user=params$user)
-Sys.setenv(output_path=output_path)
 Sys.setenv(samples_path=samples_path)
 Sys.setenv(F_primer=params$F_primer)
 Sys.setenv(R_primer=params$R_primer)
