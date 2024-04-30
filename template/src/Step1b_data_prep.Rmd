@@ -22,7 +22,7 @@ here::i_am("./Step1b_data_prep.Rmd")
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
-file_names_original <- list.files(samples_path, pattern=".gz", full.names = T, recursive = T)
+file_names_original <- list.files(here("renamed_data"), pattern=".gz", full.names = T, recursive = T)
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)

@@ -75,7 +75,7 @@ Next create a folder for results for each sequencing date in the sample sheet.
 for (j in seq_along(sequencing_dates)){
   dir.create(file.path(here(work_dir, sequencing_dates[j])))
   dir.create(file.path(here(work_dir, sequencing_dates[j], "results")))
-  dir.create(file.path(here(work_dir, sequencing_dates[j], "results/merged")))
+  dir.create(file.path(here(work_dir, sequencing_dates[j], "results/id_data")))
   dir.create(file.path(here(work_dir, sequencing_dates[j], "results/bad_controls_path")))
 }
 
@@ -97,8 +97,7 @@ seq_date_names$value <- ymd(seq_date_names$value)
 for (m in seq_along(folders)){
   from = file.path(samples_path, folders[m])
   to = file.path(here(work_dir, seq_date_names$value[m]))
-  dir_copy(from, to, overwrite=TRUE)
-  file.rename(from = file.path(to,"raw_data"), to = file.path(to, "data"))
+  dir_copy(file.path(from, "raw_data"), file.path(to, "renamed_data"), overwrite=TRUE)
 }
 
 file.copy(from=here("sample_sheet.xlsx"), to=here(work_dir))
@@ -117,7 +116,6 @@ R_primer_reverse
 ```{r}
 ## make environment variables that can be passed to bash code chunks
 Sys.setenv(user=params$user)
-Sys.setenv(samples_path=samples_path)
 Sys.setenv(F_primer=params$F_primer)
 Sys.setenv(R_primer=params$R_primer)
 Sys.setenv(F_primer_reverse = F_primer_reverse)
