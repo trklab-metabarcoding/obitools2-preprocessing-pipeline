@@ -13,10 +13,7 @@ This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tut
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, fastqcr)
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("qckitfastq")
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 here::i_am("./Step1b_data_prep.Rmd")
 ```
 
@@ -25,7 +22,7 @@ here::i_am("./Step1b_data_prep.Rmd")
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
-file_names_original <- list.files(samples_path, pattern=".gz", full.names = T, recursive = T)
+file_names_original <- list.files(here("renamed_data"), pattern=".gz", full.names = T, recursive = T)
 lab_name <- sample_sheet$SampleName
 field_name <- sample_sheet$SampleID
 df <- data.frame(field_name, lab_name)
@@ -39,7 +36,7 @@ control_samples <- unique(control_samples$SampleID)
 ```
 
 ```{r}
-capture.output(control_samples, file = here('results/control_list.txt'))
+capture.output(control_samples, file = here('results/bad_controls_path/control_list.txt'))
 capture.output(file_names, file = here('results/file_names.txt'))
 ```
 
@@ -72,12 +69,12 @@ fi
 ```
 
 ```{bash}
-cd ./data
+cd ./renamed_data
 ls *_R1_001.fastq.gz | cut -f1-2 -d "_" > sampleNames
 ```
 
 ```{bash}
-cd ./data
+cd ./renamed_data
 cat sampleNames
 ```
 
@@ -85,7 +82,7 @@ cat sampleNames
 conda init bash
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
-cd ./data
+cd ./renamed_data
 for sample in $(cat sampleNames)
 do
 
@@ -102,7 +99,7 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
 
-paste ./data/sampleNames <(grep "passing" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
+paste ./renamed_data/sampleNames <(grep "passing" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt

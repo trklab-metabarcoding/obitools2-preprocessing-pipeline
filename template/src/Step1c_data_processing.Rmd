@@ -6,6 +6,8 @@ output:
   html_document:
   df_print: paged
   toc: true
+params:
+    step1_analysis_date: !r (format(Sys.time(), "%Y%m%d"))
 ---
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
@@ -35,7 +37,7 @@ source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 cd ./results
 
-for sample in $(cat ../data/sampleNames)
+for sample in $(cat ../renamed_data/sampleNames)
 do
     echo "On sample: $sample"
     
@@ -51,7 +53,7 @@ source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 cd ./results
 
-for sample in $(cat ../data/sampleNames)
+for sample in $(cat ../renamed_data/sampleNames)
 
 do
     obigrep -p 'mode!="joined"' ${sample}_merged.fastq > ${sample}_ali.fastq
@@ -64,21 +66,21 @@ source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 cd ./results
 
-for sample in $(cat ../data/sampleNames)
+for sample in $(cat ../renamed_data/sampleNames)
 
 do
     obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
 
 done | column -t
 
-mv *_id.fastq ./merged
+mv *_id.fastq ./id_data
 ```
 
 #### Inspect read counts in fecal samples vs controls
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd ./results/merged
+cd ./results/id_data
 
 obistat -c sample *_id.fastq --without-progress-bar | column -t
 ```
@@ -87,7 +89,7 @@ obistat -c sample *_id.fastq --without-progress-bar | column -t
 ```{bash quiet=TRUE}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd ./results/merged
+cd ./results/id_data
 
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 
@@ -98,7 +100,7 @@ obicount all.uniq.fasta --without-progress-bar
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd ./results/merged
+cd ./results/id_data
 
 obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 ```
@@ -107,7 +109,7 @@ obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd ./results/merged
+cd ./results/id_data
 
 # get the counting statistics on the ‘count’ attribute
 {
@@ -119,14 +121,14 @@ obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | 
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
-cd ./results/merged
+cd ./results/id_data
 
 obitab -o all.uniq.fasta > all.uniq.tab
 ```
 #### Read the tab file as a table in R
 After running the cell below, open the table from the Environment tab and inspect the results!
 ```{r}
-all_uniq_tab <- read.delim(here("results/merged/all.uniq.tab"), header=TRUE)
+all_uniq_tab <- read.delim(here("results/id_data/all.uniq.tab"), header=TRUE)
 ```
 
 Use this space to take notes on the controls that have been looked into. For example, something like this: 
@@ -138,7 +140,7 @@ BLA20220920.A
 #### Move all the control samples over to an archive directory
 Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
 ```{r}
-merged_files <- list.files(here("results/merged"), pattern="*id.fastq", full.names = T)
+merged_files <- list.files(here("results/id_data"), pattern="*id.fastq", full.names = T)
 ```
 
 ```{r}
@@ -147,9 +149,9 @@ control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merge
 
 Add all of the `*id.fastq` files you want to move to the list named `bad_samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
 ```{r}
-##EXAMPLE: here("results/merged", c("YNP218_S1_id.fastq", "YNP297_S13_id.fastq"))
+##EXAMPLE: here("results/id_data", c("YNP218_S1_id.fastq", "YNP297_S13_id.fastq"))
 
-bad_samples_to_move <- here("results/merged", c("", ""))
+bad_samples_to_move <- here("results/id_data", c("", ""))
 ```
 
 ```{r}
@@ -159,6 +161,33 @@ move_files(bad_samples_to_move, here("results/bad_controls_path"), overwrite = F
 
 Let's also move this first data set to archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.
 ```{r}
-move_files(c(here("results/merged", "all.uniq.fasta"), here("results/merged", "all.uniq.tab")), here("results/bad_controls_path"), overwrite = FALSE)
+move_files(c(here("results/id_data", "all.uniq.fasta"), here("results/id_data", "all.uniq.tab")), here("results/bad_controls_path"), overwrite = FALSE)
 ```
+
+Create an environment variable for the results destination path.
+```{r}
+DIR = basename(getwd())
+mapped_folder <- 
+  filter(seq_date_names, value == DIR)$Folder
+Sys.setenv(mapped_folder=mapped_folder)
+Sys.setenv(analysis_date=params$step1_analysis_date)
+```
+
+Copy over your results folder and the Steps 1b and 1c notebooks to the shared lab directory on Oscar.
+**Note: Save this notebook first so any results are recorded before copying.**
+```{bash}
+source ~/.bash_profile
+conda activate /users/${user}/.conda/envs/obitools-env
+
+destination=${data_path}/${project_code}/${mapped_folder}/${DIR}/${analysis_date}
+mkdir -p ${destination}
+cp -r ./results/id_data ${destination}
+cp -r ./results/bad_controls_path ${destination}
+cp -r ./renamed_data ${destination}
+cp *.Rmd ${destination}
+cp cutadapt_primer_trimming_stats.txt ${destination}
+
+conda deactivate
+```
+
 Now navigate to the notebook `Step3a_data_cleaning.Rmd` in the `obitools2-taxonomy-assignment` [repository](https://github.com/trklab-metabarcoding/obitools2-taxonomy-assignment). Use the Files pane in RStudio to navigate to `/oscar/data/tkartzin/r'params$user'/obitools2-taxonomy-assignment`.
