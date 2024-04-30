@@ -36,7 +36,7 @@ control_samples <- unique(control_samples$SampleID)
 ```
 
 ```{r}
-capture.output(control_samples, file = here('results/control_list.txt'))
+capture.output(control_samples, file = here('results/bad_controls_path/control_list.txt'))
 capture.output(file_names, file = here('results/file_names.txt'))
 ```
 
@@ -69,12 +69,12 @@ fi
 ```
 
 ```{bash}
-cd ./data
+cd ./renamed_data
 ls *_R1_001.fastq.gz | cut -f1-2 -d "_" > sampleNames
 ```
 
 ```{bash}
-cd ./data
+cd ./renamed_data
 cat sampleNames
 ```
 
@@ -82,7 +82,7 @@ cat sampleNames
 conda init bash
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
-cd ./data
+cd ./renamed_data
 for sample in $(cat sampleNames)
 do
 
@@ -99,7 +99,7 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
 
-paste ./data/sampleNames <(grep "passing" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
+paste ./renamed_data/sampleNames <(grep "passing" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
 ```
 
 Deactivate the conda environment that uses Python 3 for Cutadapt
