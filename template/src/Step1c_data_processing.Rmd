@@ -32,7 +32,7 @@ fi
 #### Merge Illumina forward and reverse reads
 
 ```{bash}
-#Recover full sequence reads from forward and reverse partial reads using illuminapiredend command in obitools
+#Recover full sequence reads from forward and reverse partial reads using illuminapairedend command in obitools
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 cd ./results
@@ -185,7 +185,7 @@ cp -r ./results/id_data ${destination}
 cp -r ./results/bad_controls_path ${destination}
 cp -r ./renamed_data ${destination}
 cp *.Rmd ${destination}
-cp cutadapt_primer_trimming_stats.txt ${destination}
+cp ./results/cutadapt_primer_trimming_stats.txt ${destination}
 
 conda deactivate
 ```
