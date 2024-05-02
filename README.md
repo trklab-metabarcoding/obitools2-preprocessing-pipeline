@@ -42,17 +42,6 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 ![Rproj example](images/Rproj-example.png)
 
 
-## Workflow structure
-
-The main folders in this repository are:
-- `images`: this is just for the images used in the README
-- `data`: this can be used to copy over your dataset
-- `template`: this contains `data`, `src`, and `test_data` folders
-  - `src`: the notebooks for running the code, numbered 1b and 1c
-  - `test_data`: a simple dataset to use for learning the workflow
-  - `sample_sheet_test`: an example datasheet for use in step 1
-
-
 ## Getting sequencing data onto OSCAR
 
 Raw sequencing data is stored in dated folders at `/oscar/data/tkartzin/projects/<project_code>/`. The permissions at this location are limited to trklab people.
