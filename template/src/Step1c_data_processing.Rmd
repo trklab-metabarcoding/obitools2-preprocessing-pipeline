@@ -7,7 +7,21 @@ output:
   df_print: paged
   toc: true
 params:
-    step1_analysis_date: !r (format(Sys.time(), "%Y%m%d"))
+    #don't change these
+    datetime: !r (format(Sys.time(), "%Y%m%dT%H:%M:%SZ"))
+    user: !r Sys.getenv("LOGNAME")
+    data_path: "/oscar/data/tkartzin/projects"
+  
+    #do change params below this line as needed
+    project_code: "test"
+    todaydate: !r (format(Sys.Date(), "%Y%m%d"))
+    
+    ##obitools params
+    min_read_count: 1000
+    min_read_length: 8 # -l in obigrep
+    max_read_length: 300 # -L in obigrep
+    clean_threshold: 0.05 # -r in obiclean
+    matching_score: 40 # --score-min in illuminapairedend
 ---
 ```{r include=FALSE}
 ## Only needed for knitr to render this notebook
@@ -170,7 +184,7 @@ DIR = basename(getwd())
 mapped_folder <- 
   filter(seq_date_names, value == DIR)$Folder
 Sys.setenv(mapped_folder=mapped_folder)
-Sys.setenv(analysis_date=params$step1_analysis_date)
+Sys.setenv(analysis_date=params$todaydate)
 ```
 
 Copy over your results folder and the Steps 1b and 1c notebooks to the shared lab directory on Oscar.
@@ -179,7 +193,7 @@ Copy over your results folder and the Steps 1b and 1c notebooks to the shared la
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 
-destination=${data_path}/${project_code}/${mapped_folder}/${DIR}/${analysis_date}
+destination=${data_path}/${project_code}/${mapped_folder}/${DIR}/${todaydate}
 mkdir -p ${destination}
 cp -r ./results/id_data ${destination}
 cp -r ./results/bad_controls_path ${destination}

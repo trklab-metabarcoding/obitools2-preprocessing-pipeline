@@ -15,17 +15,6 @@ params:
   
     #do change params below this line as needed
     project_code: "test"
-    
-    ##obitools params
-    min_read_count: 1000
-    min_read_length: 8 # -l in obigrep
-    max_read_length: 300 # -L in obigrep
-    clean_threshold: 0.05 # -r in obiclean
-    matching_score: 40 # --score-min in illuminapairedend
-    ##cutadapt params
-    primer_mismatch: 3
-    F_primer: "GGGCAATCCTGAGCCAA" # update to match your primer set
-    R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
 
 ### Environment Setup
@@ -37,7 +26,7 @@ here::i_am("./Step1a_env_setup.Rmd")
 
 ```{r setup, include=FALSE}
 # set global chunk parameters here
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 do.call('Sys.setenv', params)
 ```
 

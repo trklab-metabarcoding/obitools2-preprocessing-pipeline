@@ -6,6 +6,19 @@ output:
   html_document:
   df_print: paged
   toc: true
+params: 
+    #don't change these
+    datetime: !r (format(Sys.time(), "%Y%m%dT%H:%M:%SZ"))
+    user: !r Sys.getenv("LOGNAME")
+    data_path: "/oscar/data/tkartzin/projects"
+  
+    #do change params below this line as needed
+    project_code: "test"
+    
+    ##cutadapt params
+    primer_mismatch: 3
+    F_primer: "GGGCAATCCTGAGCCAA" # update to match your primer set
+    R_primer: "CCATTGAGTCTCTGCACCTATC"
 ---
 
 This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs.
@@ -70,7 +83,7 @@ fi
 
 ```{bash}
 cd ./renamed_data
-ls *_R1_001.fastq.gz | cut -f1-2 -d "_" > sampleNames
+ls *_R1_001.fastq.gz | cut -f1-1 -d "_" > sampleNames
 ```
 
 ```{bash}
