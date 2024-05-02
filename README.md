@@ -2,7 +2,7 @@
 
 This repository contains the code for pre-processing metabarcoding data with OBITools v.1.2.12 on Brown's high-performance cluster, OSCAR. 
 
-**Note:** Pre-processing steps are run on individual sequencing runs. This is to ensure that we can check "samples" and "controls" for contamination on a run-by-run basis. 
+**Note:** Pre-processing steps are run on individual sequencing runs to ensure that we can check "samples" and "controls" for contamination on a run-by-run basis. 
 
 The steps included in this repository include:
 
@@ -13,6 +13,7 @@ The steps included in this repository include:
 3. merge reads, dereplicate reads, and check control samples for contamination (step 1c)
 
 The schematic below shows the entire bioinformatic pipeline for DNA metabarcoding data, but the steps included in this repository are shown in the light grey box. 
+
 ![Rproj example](images/bioinformatic_pipeline_overview2.png)
 
 
@@ -37,6 +38,7 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 - [ ] Also in the terminal: `cd obitools2-preprocessing-pipeline`
 - [ ] In the Files panes of RStudio, use the menu at the top right to make sure you are also at the same path.
 - [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
+
 ![Rproj example](images/Rproj-example.png)
 
 
@@ -64,24 +66,24 @@ Project codes include:
 - SEV: Sevilleta
 
 If you need to copy over data to OSCAR, the easiest way to do that is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
+
 ![smb_example](images/smb_example.png)
 
-- In the Finder window, drag and drop raw sequence files (fastq.gz) from local into a dated folder in the correct project code.
+In the Finder window, drag and drop raw sequence files (fastq.gz) from local into a dated folder in the correct project code.
 
 **Note:** The pipeline expects `.gz` file pairs for each sample (i.e. forward and reverse reads) so make sure both are copied over when transferring data.  
 
 
 ## Prepare your sample sheet
 
-Before running step 1, you need to complete a sample sheet. Take a look at the `sample_sheet.xlsx` as an example and the fill out `sample_sheet_blank.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
+Before running step 1, you need to complete a sample sheet. In the parent directory, take a look at the `sample_sheet.xlsx` as an example and the fill out `sample_sheet_blank.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
 
 **Note:** While we run pre-processing steps on individual sequencing runs, multiple sequencing runs can be processed at the same time, so it's important to include the folder name of where the sequencing data can be found in your sample sheet. 
 
 
 ## Running the Notebooks for Step 1:
 
-**Note:** The first notebook (step_1a) is in the parent directory.
-The notebooks can be opened by double-clicking from the RStudio `Files` window.
+**Note:** The first notebook (step_1a) is in the parent directory. Notebooks can be opened by double-clicking from the RStudio `Files` window.
 
 ### Step 1a. `Step1a_env_setup.Rmd`
 The first step is to update all of the `params` in the YAML header of the first notebook. You can click "run all" from the drop-down menu at the top of the notebook to generate parameters and create environment variables.
