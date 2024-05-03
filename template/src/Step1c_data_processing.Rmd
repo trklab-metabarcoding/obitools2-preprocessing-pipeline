@@ -8,7 +8,6 @@ output:
   toc: true
 params:
     #don't change these
-    datetime: !r (format(Sys.time(), "%Y%m%dT%H:%M:%SZ"))
     user: !r Sys.getenv("LOGNAME")
     data_path: "/oscar/data/tkartzin/projects"
   
@@ -30,8 +29,13 @@ pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 here::i_am("./Step1c_data_processing.Rmd")
 ```
 
-#### Set up Conda env for OBITools
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+do.call('Sys.setenv', params)
+```
 
+#### Set up Conda env for OBITools
 ```{bash, install obitools, eval = FALSE, echo = FALSE}
 source ~/.bash_profile
 
@@ -44,7 +48,6 @@ fi
 ```
 
 #### Merge Illumina forward and reverse reads
-
 ```{bash}
 #Recover full sequence reads from forward and reverse partial reads using illuminapairedend command in obitools
 source ~/.bash_profile
@@ -193,7 +196,7 @@ Copy over your results folder and the Steps 1b and 1c notebooks to the shared la
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 
-destination=${data_path}/${project_code}/${mapped_folder}/${DIR}/${todaydate}
+destination=${data_path}/${project_code}/${mapped_folder}/${DIR}/${analysis_date}_${user}
 mkdir -p ${destination}
 cp -r ./results/id_data ${destination}
 cp -r ./results/bad_controls_path ${destination}

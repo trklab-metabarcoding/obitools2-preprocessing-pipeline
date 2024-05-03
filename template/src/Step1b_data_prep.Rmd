@@ -8,7 +8,6 @@ output:
   toc: true
 params: 
     #don't change these
-    datetime: !r (format(Sys.time(), "%Y%m%dT%H:%M:%SZ"))
     user: !r Sys.getenv("LOGNAME")
     data_path: "/oscar/data/tkartzin/projects"
   
@@ -30,8 +29,30 @@ pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings)
 here::i_am("./Step1b_data_prep.Rmd")
 ```
 
-#### Rename files with project-specific sample names
+```{r setup, include=FALSE}
+# set global chunk parameters here
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+do.call('Sys.setenv', params)
+```
 
+#### Generate some derived parameters from the inputs
+```{r}
+F_primer_reverse <- reverseComplement(params$F_primer)
+R_primer_reverse <- reverseComplement(params$R_primer)
+F_primer_reverse 
+R_primer_reverse
+```
+
+```{r}
+## make environment variables that can be passed to bash code chunks
+Sys.setenv(user=params$user)
+Sys.setenv(F_primer=params$F_primer)
+Sys.setenv(R_primer=params$R_primer)
+Sys.setenv(F_primer_reverse = F_primer_reverse)
+Sys.setenv(R_primer_reverse = R_primer_reverse)
+```
+
+#### Rename files with project-specific sample names
 We can make a list of the existing fasta.gz files, and then use column pairings with lab and field sample names to update the file names.
 
 ```{r}
@@ -83,7 +104,7 @@ fi
 
 ```{bash}
 cd ./renamed_data
-ls *_R1_001.fastq.gz | cut -f1-1 -d "_" > sampleNames
+ls *_R1_001.fastq.gz | cut -f1 -d "_" > sampleNames
 ```
 
 ```{bash}
@@ -91,11 +112,20 @@ cd ./renamed_data
 cat sampleNames
 ```
 
+#### Strip out sample IDs from file names
+```{bash}
+cd ./renamed_data
+for file in *; do
+  mv "$file" "`echo $file | sed "s/_[^_]*_/_/"`";
+done
+```
+
 ```{bash}
 conda init bash
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/cutadaptenv
 cd ./renamed_data
+
 for sample in $(cat sampleNames)
 do
 

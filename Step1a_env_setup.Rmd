@@ -90,23 +90,4 @@ for (m in seq_along(folders)){
 }
 
 file.copy(from=here("sample_sheet.xlsx"), to=here(work_dir))
-
-```
-
-#### Generate some derived parameters from the inputs
-
-```{r}
-F_primer_reverse <- reverseComplement(params$F_primer)
-R_primer_reverse <- reverseComplement(params$R_primer)
-F_primer_reverse 
-R_primer_reverse
-```
-
-```{r}
-## make environment variables that can be passed to bash code chunks
-Sys.setenv(user=params$user)
-Sys.setenv(F_primer=params$F_primer)
-Sys.setenv(R_primer=params$R_primer)
-Sys.setenv(F_primer_reverse = F_primer_reverse)
-Sys.setenv(R_primer_reverse = R_primer_reverse)
 ```
