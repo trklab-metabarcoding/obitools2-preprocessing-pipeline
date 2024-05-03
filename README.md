@@ -1,11 +1,25 @@
 # obitools2-preprocessing-pipeline
 
-This repository contains the code to process metabarcoding data with OBITools v.1.2.12 on Brown's high-performance cluster, Oscar.
-The following steps provide guidance on connecting to an RStudio server on Oscar and running the interactive R Notebooks.
+This repository contains the code for pre-processing metabarcoding data with OBITools v.1.2.12 on Brown's high-performance cluster, OSCAR. 
+
+**Note:** Pre-processing steps are run on individual sequencing runs to ensure that we can check "samples" and "controls" for contamination on a run-by-run basis. 
+
+The steps included in this repository include:
+
+1. setting up folder structure for conducting pre-processing steps (step 1a)
+
+2. remove primers from forward and reverse sequence reads (step 1b)
+
+3. merge reads, dereplicate reads, and check control samples for contamination (step 1c)
+
+The schematic below shows the entire bioinformatic pipeline for DNA metabarcoding data, but the steps included in this repository are shown in the light grey box. 
+
+![bioinformatic_pipeline](images/bioinformatic_pipeline_overview2.png)
+
 
 ## Connecting to Oscar
 
-There are three ways to interact with Oscar: 
+The following steps provide guidance on connecting to an RStudio server on Oscar. There are three ways to interact with Oscar: 
 
 1. Through an [RStudio Server](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/open-ondemand/using-rstudio) hosted on Open OnDemand. All interactions are through the various RStudio panes.
 
@@ -20,61 +34,63 @@ Option #1 is recommended for this use case, and allows us to choose a newer vers
 - [ ] Under Modules put `git miniconda3`.
 - [ ] Launch the session once it has been allocated. 
 - [ ] Go to the terminal pane in RStudio and `cd /oscar/data/tkartzin/<your folder>` (replace <your folder> with your user folder here)
-- [ ] In that terminal `git clone https://github.com/trklab-metabarcoding/obitools2-pipeline.git`
-- [ ] Also in the terminal: `cd obitools2-pipeline`
+- [ ] In that terminal `git clone https://github.com/trklab-metabarcoding/obitools2-preprocessing-pipeline.git`
+- [ ] Also in the terminal: `cd obitools2-preprocessing-pipeline`
 - [ ] In the Files panes of RStudio, use the menu at the top right to make sure you are also at the same path.
 - [ ] Double-click the `.obitools2-pipeline.Rproj` file to set the project working directory. All of the notebooks are built from this working directory.
+
 ![Rproj example](images/Rproj-example.png)
 
-**Note:** Global reference databases will be stored in the shared lab directory: `/oscar/data/tkartzin/global_ref_lib_plants`
 
-## Workflow structure
+## Getting sequencing data onto OSCAR
 
-The main folders in this repository are:
-- `images`: this is just for the images used in the README
-- `data`: this can be used to copy over your dataset
-- `template`: this contains `data`, `src`, and `test_data` folders
-  - `src`: the notebooks for running the code, numbered 1, 2a, 2b, 2c, 3
-    - `per_run`: 2a and 2b are run for each sequencing run
-    - `all_runs` 2c and 3 are run once for the entire dataset
-  - `test_data`: a simple dataset to use for learning the workflow
+Raw sequencing data is stored in dated folders at `/oscar/data/tkartzin/projects/<project_code>/`. The permissions at this location are limited to trklab people.
 
-## Getting data into your workflow
+Project codes include: 
+- test: test data 
+- YNP: Yellowstone
+- FJ: Fray Jorge
+- MRC: Africa projects (giraffes/UHURU)
+- Banff
+- SEV: Sevilleta
 
-The easiest way to copy over your data is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
+If you need to copy over data to OSCAR, the easiest way to do that is through the SMB client in your local Mac Finder app. Connect as described [here](https://docs.ccv.brown.edu/oscar/connecting-to-oscar/cifs) and use the path displayed in this example:
+
 ![smb_example](images/smb_example.png)
 
-- Data should be in the common `projects` folder at `/oscar/data/tkartzin/projects`. The permissions at this location are limited to trklab people.
-- In the Finder window, drag and drop your folders of files from local. They will get copied over into a dated working folder in your pipeline after running Step1.
+In the Finder window, drag and drop raw sequence files (fastq.gz) from local into a dated folder in the correct project code.
 
-**Note:** The pipeline expects all the `.gz` file pairs in folders that correspond to each sequencing date specified in the sample sheet. Drag over parent folders with `.gz` inside each folder and the pipeline will rename by sequencing date, according to your sample sheet.
+**Note:** The pipeline expects `.gz` file pairs for each sample (i.e. forward and reverse reads) so make sure both are copied over when transferring data.  
 
-Take a look at the `template/sample_sheet_blank.xlsx` while you have SMB mounted; fill out `sample_sheet.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
 
-## Running the Notebooks
+## Prepare your sample sheet
 
-**Note:** The first notebook is in the parent directory.
-The notebooks can be opened by double-clicking from the RStudio `Files` window.
-The first step is to update all of the `params` in the YAML header of the first notebook. 
+Before running step 1, you need to complete a sample sheet. In the parent directory, take a look at the `sample_sheet.xlsx` as an example and the fill out `sample_sheet_blank.xlsx` with your own metadata. Leave the sample sheet in the root directory of the repo. Dates should be in YYYYMMDD format (General or Text format in Excel).
 
-### 1. `Step1a_env_setup.Rmd`
-This first notebook generates a new folder with today's date for you analysis, and copies over data, source notebooks, and the empty results folder.
+**Note:** While we run pre-processing steps on individual sequencing runs, multiple sequencing runs can be processed at the same time, so it's important to include the folder name of where the sequencing data can be found in your sample sheet. 
 
-Run all from the drop-down menu to generate parameters and create environment variables.
 
-Next navigate to the `src` folder inside the new folder with today's date to view the analysis notebooks.
+## Running the Notebooks for Step 1:
 
-### 2. `Step1b_data_prep.Rmd`
-The second notebook is where you set all of your parameters for trimming, filtering, primers, etc. This notebook also runs `cutadapt` to trim off primers.
+**Note:** The first notebook (step_1a) is in the parent directory. Notebooks can be opened by double-clicking from the RStudio `Files` window.
 
-### 3. `Step1c_data_processing.Rmd`
-The third notebook filters files and merges all the reads into one file per sample. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis.
+### Step 1a. `Step1a_env_setup.Rmd`
+The first step is to update all of the `params` in the YAML header of the first notebook. You can click "run all" from the drop-down menu at the top of the notebook to generate parameters and create environment variables.
 
-### 4. `Step2c_data_cleaning.Rmd`
-The fourth notebook re-runs the merging steps with the bad samples removed and cleans the data set to prepare if for taxonomy assignment.
+This first notebook generates a new folder with today's date and time (e.g. 20240502T10:43:32Z). Within this folder, you will find individual folders for each sequencing data that you specified in your sample sheet. Inside these, this notebook copies over data, source notebooks, and an empty results folder.
 
-### 5. `Step3_taxonomy_assignment.Rmd`
-The final notebook is for assigning taxonomy to your cleaned reads!
+For each sequencing date, you now need to navigate to the following notebooks. 
+
+### Step 1b. `Step1b_data_prep.Rmd`
+The second notebook is where you set all of your parameters for trimming, filtering, primers, etc. This notebook also runs `cutadapt` to trim primers from your forward and reverse reads. 
+
+### Step 1c. `Step1c_data_processing.Rmd`
+The third notebook merges forward and reverse reads for each sample, filters merged reads, and dereplicates sequences across all samples into a single FASTA file. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis.
+
+
+## Output
+At the end of this step, the output will be moved to a results folder in the appropriate sequencing run folder on `/oscar/data/tkartzin/projects/<project code>/`
+
 
 ## Check for the latest code
 
@@ -98,5 +114,5 @@ Useful git commands:
 
 ## Troubleshooting
 
-* If your R session hangs, the environment variables will be lost, so it is best to start back at the top with Step 1.
-* When creating the conda environments in Steps 2a and 2b, they only need to be created once. They will take some time to resolve dependencies when first created, but then can simply be activated each time they are needed thereafter.
+* If your R session hangs, the environment variables will be lost, so it is best to start back at the top with Step 1a.
+* When creating the conda environments in steps 1b and 1c, they only need to be created once. They will take some time to resolve dependencies when first created, but then can simply be activated each time they are needed thereafter.
