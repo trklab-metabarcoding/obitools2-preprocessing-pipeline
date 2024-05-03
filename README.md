@@ -14,7 +14,7 @@ The steps included in this repository include:
 
 The schematic below shows the entire bioinformatic pipeline for DNA metabarcoding data, but the steps included in this repository are shown in the light grey box. 
 
-![Rproj example](images/bioinformatic_pipeline_overview2.png)
+![bioinformatic_pipeline](images/bioinformatic_pipeline_overview2.png)
 
 
 ## Connecting to Oscar
@@ -86,6 +86,10 @@ The second notebook is where you set all of your parameters for trimming, filter
 
 ### Step 1c. `Step1c_data_processing.Rmd`
 The third notebook merges forward and reverse reads for each sample, filters merged reads, and dereplicates sequences across all samples into a single FASTA file. There are interactive steps at the end to investigate controls and move any suspicious samples out of the analysis.
+
+
+## Output
+At the end of this step, the output will be moved to a results folder in the appropriate sequencing run folder on `/oscar/data/tkartzin/projects/<project code>/`
 
 
 ## Check for the latest code
