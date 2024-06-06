@@ -18,7 +18,7 @@ params:
     ##obitools params
     min_read_count: 1000
     min_read_length: 8 # -l in obigrep
-    max_read_length: 300 # -L in obigrep
+    max_read_length: 300 # -L in obigrep #if an upper bound is not appropriate for your study, enter max length of locus 
     clean_threshold: 0.05 # -r in obiclean
     matching_score: 40 # --score-min in illuminapairedend
 ---
@@ -61,7 +61,7 @@ do
     illuminapairedend --score-min=$matching_score -r ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001_trimmed.fastq.gz > ${sample}_merged.fastq
     
     obicount ${sample}_merged.fastq
-done
+done | column -t
 ```
 
 #### Filter out unaligned reads

@@ -14,7 +14,8 @@ params:
     data_path: "/oscar/data/tkartzin/projects"
   
     #do change params below this line as needed
-    project_code: "test"
+    sample_sheet: "sample_sheet_URI_20231213.xlsx"
+    project_code: "FJ"
 ---
 
 ### Environment Setup
@@ -33,13 +34,13 @@ do.call('Sys.setenv', params)
 #### Set up standard path variables
 
 **Note:** When using the provided test data for training:
-Make sure you set the `project_code` param in the YAML to "test" and save as copy of `sample_sheet_test.xlsx` as `sample_sheet.xlsx`!
+Make sure you set the `project_code` param in the YAML to "test" and use the provided `sample_sheet_test.xlsx`!
 
 ```{r}
 dir.create(here(params$datetime))
 work_dir <- file.path(here(params$datetime))
 
-sample_sheet <- read_xlsx(here("sample_sheet.xlsx"), col_types = "text")
+sample_sheet <- read_xlsx(here(params$sample_sheet), col_types = "text")
 ```
 
 #### Cleanup on data formats
@@ -89,5 +90,5 @@ for (m in seq_along(folders)){
   dir_copy(file.path(from, "raw_data"), file.path(to, "renamed_data"), overwrite=TRUE)
 }
 
-file.copy(from=here("sample_sheet.xlsx"), to=here(work_dir))
+file.copy(from=here(params$sample_sheet), to=here(work_dir))
 ```
