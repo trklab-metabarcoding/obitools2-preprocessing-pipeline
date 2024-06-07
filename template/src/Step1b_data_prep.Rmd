@@ -16,8 +16,8 @@ params:
     
     ##cutadapt params
     primer_mismatch: 3
-    F_primer: "GGGCAATCCTGAGCCAA" # update to match your primer set
-    R_primer: "CCATTGAGTCTCTGCACCTATC"
+    F_primer: "GGGCAATCCTGAGCCAA" # forward primer used in PCR (or you are interested in using, excluding Nextera overhang)
+    R_primer: "CCATTGAGTCTCTGCACCTATC" # reverse primer used in PCR (or you are interested in using, excluding Nextera overhang)
 ---
 
 This notebook can be used to run the OBITools 1.2.12 pipeline and serve as a tutorial. Run through each code chunk and inspect the outputs.
@@ -131,7 +131,7 @@ do
 
     echo "On sample: $sample"
   
-    cutadapt -a ^$F_primer...$R_primer_reverse -A ^$R_primer...$R_primer_reverse --no-indels -e $primer_mismatch --discard-untrimmed -o ${sample}_L001_R1_001_trimmed.fastq.gz -p ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001.fastq.gz ${sample}_L001_R2_001.fastq.gz >> ../results/cutadapt_primer_trimming_stats.txt 2>&1
+    cutadapt -a $F_primer...$R_primer_reverse -A $R_primer...$F_primer_reverse --no-indels -e $primer_mismatch --discard-untrimmed -o ${sample}_L001_R1_001_trimmed.fastq.gz -p ${sample}_L001_R2_001_trimmed.fastq.gz ${sample}_L001_R1_001.fastq.gz ${sample}_L001_R2_001.fastq.gz >> ../results/cutadapt_primer_trimming_stats.txt 2>&1
 done
 
 mv *trimmed.fastq.gz ../results
