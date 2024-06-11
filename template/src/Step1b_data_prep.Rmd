@@ -136,7 +136,14 @@ done
 
 mv *trimmed.fastq.gz ../results
 ```
-Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
+Column 2 reports: the number and fraction of reads  retained in each sample
+Column 3 reports: what fraction of bps were retained in each sample. 
+
+#Rule of thumb based on trnL-P6, g/h runs; projects will vary: Expect \~95%+ of reads to be retained and \~50-70% of bps.
+
+#####
+#TRK says: Interpreting these columns properly is important. Our expectation would be that samples and positive controls retain very high percentages of reads (~95%) whereas blanks and negative controls would hopefully retain relatively few, notwithstanding tag jumps or contamination. One reason projects using different markers will vary in percentages of bps retained is that the program is trimming ends, so if the sequencer calls many more basepairs than you need to sequence all the way across your marker then you would expect a lower proportion of basepairs to be retained.
+#####
 
 ```{bash}
 source ~/.bash_profile
