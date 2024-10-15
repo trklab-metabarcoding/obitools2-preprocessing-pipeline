@@ -16,10 +16,6 @@ params:
     todaydate: !r (format(Sys.Date(), "%Y%m%d"))
     
     ##obitools params
-    min_read_count: 1000
-    min_read_length: 8 # -l in obigrep
-    max_read_length: 300 # -L in obigrep #if an upper bound is not appropriate for your study, enter max length of locus 
-    clean_threshold: 0.05 # -r in obiclean
     matching_score: 40 # --score-min in illuminapairedend
 ---
 ```{r include=FALSE}
