@@ -1,7 +1,7 @@
 ---
 title: "Step1c_data_processing"
-author: "T. Divoll"
-date: "2023-09-12"
+author: "T. Divoll & B.Littleford-Colquhoun"
+date: "2024-10-29"
 output: 
   html_document:
   df_print: paged
@@ -10,12 +10,11 @@ params:
     #don't change these
     user: !r Sys.getenv("LOGNAME")
     data_path: "/oscar/data/tkartzin/projects"
+    todaydate: !r (format(Sys.Date(), "%Y%m%d"))
   
     #do change params below this line as needed
     project_code: "test"
-    todaydate: !r (format(Sys.Date(), "%Y%m%d"))
-    
-    ##obitools params
+    sequcing_date: "20221013" # edit this date to match the sequencing date of the run you are working on (i.e. date should match directory label)
     matching_score: 40 # --score-min in illuminapairedend
 ---
 ```{r include=FALSE}
@@ -90,12 +89,16 @@ mv *_id.fastq ./id_data
 ```
 
 #### Inspect read counts in fecal samples vs controls
+*Each time you run this script:* work with output 'sequencingdate_step1c_sample_readcount.txt' to identify "bad samples" and make sure sample/control read counts are in appropriate range. For manuscript reporting, make sure to include "bad samples" in summary counts.
+
+*If your project includes multiple runs:* assuming consistency across runs, it's appropriate to combine values from each of these outputs to report summary counts in your paper for samples and controls. 
+
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
-obistat -c sample *_id.fastq --without-progress-bar | column -t
+obistat -c sample *_id.fastq --without-progress-bar | column -t | tee -a ${sequcing_date}_step1c_sample_readcount.txt
 ```
 
 #### Combine remaining sequences into one FASTA and dereplicate
@@ -138,6 +141,7 @@ cd ./results/id_data
 
 obitab -o all.uniq.fasta > all.uniq.tab
 ```
+
 #### Read the tab file as a table in R
 After running the cell below, open the table from the Environment tab and inspect the results!
 ```{r}
@@ -150,7 +154,8 @@ BLA20220920.A
 6671/17628 (38%) – Glehnia littoralis = American silvertop
 3442/5438 (63%) – Musa balbisiana = plantain
 ```
-#### Move all the control samples over to an archive directory
+
+#### Move all the control samples and "bad" samples over to an archive directory
 Now that the controls have been looked into, we can move the sample files over to a folder called `control_samples`
 ```{r}
 merged_files <- list.files(here("results/id_data"), pattern="*id.fastq", full.names = T)
@@ -160,9 +165,9 @@ merged_files <- list.files(here("results/id_data"), pattern="*id.fastq", full.na
 control_files <- merged_files[grepl(paste(control_samples, collapse= "|"), merged_files)]
 ```
 
-Add all of the `*id.fastq` files you want to move to the list named `bad_samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads).
+Add all of the `*id.fastq` files you want to move to the list named `bad_samples_to_move`. This will move them to a `bad_controls_samples` folder. These can be from suspected contamination or from low read counts (i.e., < 1000 reads). Make sure you write the full file name for each sample you want to remove. 
 ```{r}
-##EXAMPLE: here("results/id_data", c("YNP218_S1_id.fastq", "YNP297_S13_id.fastq"))
+##EXAMPLE: here("results/id_data", c("YNP218_S1_id.fastq", "YNP297_S13_id.fastq")) 
 
 bad_samples_to_move <- here("results/id_data", c("", ""))
 ```
@@ -172,7 +177,7 @@ move_files(control_files, here("results/bad_controls_path"), overwrite = FALSE)
 move_files(bad_samples_to_move, here("results/bad_controls_path"), overwrite = FALSE)
 ```
 
-Let's also move this first data set to archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.
+Let's also move this first data set to an archive and we will re-run merging and de-replication in the next notebook, without controls and bad samples.
 ```{r}
 move_files(c(here("results/id_data", "all.uniq.fasta"), here("results/id_data", "all.uniq.tab")), here("results/bad_controls_path"), overwrite = FALSE)
 ```
@@ -187,7 +192,7 @@ Sys.setenv(analysis_date=params$todaydate)
 ```
 
 Copy over your results folder and the Steps 1b and 1c notebooks to the shared lab directory on Oscar.
-**Note: Save this notebook first so any results are recorded before copying.**
+*Note: Save this notebook first so any results are recorded before copying.*
 ```{bash}
 source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
