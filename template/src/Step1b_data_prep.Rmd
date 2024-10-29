@@ -1,7 +1,7 @@
 ---
 title: "Step 1b - data preparation"
-author: "T. Divoll"
-date: "2023-09-12"
+author: "T. Divoll & B. Littleford-Colquhoun"
+date: "2024-10-29"
 output: 
   html_document:
   df_print: paged
@@ -136,7 +136,10 @@ done
 
 mv *trimmed.fastq.gz ../results
 ```
-Now look at what fraction of reads were retained in each sample (column 2) and what fraction of bps were retained in each sample (column 3). Expect \~95%+ of reads to be retained and \~50-70% of bps.
+
+Now look at what fraction of reads (column 2) and bps (column 3) were retained in each sample. Expectations for these values will vary depending on project/marker, but we want to see internal consistency across samples/runs. Positive controls and samples will tend to have higher retention that negative controls and blanks. 
+
+For example, for P6 trnL (g/h) we expect \~95%+ of reads and \~50-70% of bps to be retained. For c/h primers trimmed to g/h primers, we expect less. 
 
 ```{bash}
 source ~/.bash_profile
