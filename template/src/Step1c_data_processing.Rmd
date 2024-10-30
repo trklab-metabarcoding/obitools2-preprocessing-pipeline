@@ -1,5 +1,6 @@
 ---
 title: "Step1c_data_processing"
+subtitle: "Merge forward and reverse reads, dereplicate sequence reads across samples, and remove control and bad samples."
 author: "T. Divoll & B.Littleford-Colquhoun"
 date: "2024-10-29"
 output: 
@@ -14,7 +15,7 @@ params:
   
     #do change params below this line as needed
     project_code: "test"
-    sequcing_date: "20221013" # edit this date to match the sequencing date of the run you are working on (i.e. date should match directory label)
+    sequencing_date: "20221013" # edit this date to match the sequencing date of the run you are working on (i.e. date should match directory label)
     matching_score: 40 # --score-min in illuminapairedend
 ---
 ```{r include=FALSE}
@@ -98,7 +99,7 @@ source ~/.bash_profile
 conda activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
-obistat -c sample *_id.fastq --without-progress-bar | column -t | tee -a ${sequcing_date}_step1c_sample_readcount.txt
+obistat -c sample *_id.fastq --without-progress-bar | column -t | tee -a ${sequencing_date}_step1c_sample_readcount.txt
 ```
 
 #### Combine remaining sequences into one FASTA and dereplicate
