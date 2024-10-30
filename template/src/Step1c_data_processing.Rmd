@@ -129,9 +129,7 @@ source activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
 # get the counting statistics on the ‘count’ attribute
-{
-obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t 
-} | tee -a seq_count_table.txt
+obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | column -t | tee -a seq_count_table.txt
 ```
 
 #### Create a tabulated file for counts per sequence read
