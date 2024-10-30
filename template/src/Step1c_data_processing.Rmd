@@ -47,7 +47,7 @@ fi
 ```{bash}
 #Recover full sequence reads from forward and reverse partial reads using illuminapairedend command in obitools
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results
 
 for sample in $(cat ../renamed_data/sampleNames)
@@ -63,28 +63,28 @@ done | column -t
 #### Filter out unaligned reads
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results
 
 for sample in $(cat ../renamed_data/sampleNames)
 
 do
     obigrep -p 'mode!="joined"' ${sample}_merged.fastq > ${sample}_ali.fastq
-done | column -t
+done
 ```
 
 #### Add sample names to each file
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results
 
 for sample in $(cat ../renamed_data/sampleNames)
 
 do
     obiannotate -S sample:${sample} ${sample}_ali.fastq >  ${sample}_id.fastq
-
-done | column -t
+    
+done
 
 mv *_id.fastq ./id_data
 ```
@@ -96,7 +96,7 @@ mv *_id.fastq ./id_data
 
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
 obistat -c sample *_id.fastq --without-progress-bar | column -t | tee -a ${sequencing_date}_step1c_sample_readcount.txt
@@ -105,7 +105,7 @@ obistat -c sample *_id.fastq --without-progress-bar | column -t | tee -a ${seque
 #### Combine remaining sequences into one FASTA and dereplicate
 ```{bash quiet=TRUE}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
@@ -116,7 +116,7 @@ obicount all.uniq.fasta --without-progress-bar
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
 obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
@@ -125,7 +125,7 @@ obiannotate -k count -k merged_sample all.uniq.fasta > $$ ; mv $$ all.uniq.fasta
 #### Inspect the `count` attribute
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
 # get the counting statistics on the ‘count’ attribute
@@ -137,7 +137,7 @@ obistat -c count all.uniq.fasta --without-progress-bar | sort -nk1 | head -20 | 
 #### Create a tabulated file for counts per sequence read
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 cd ./results/id_data
 
 obitab -o all.uniq.fasta > all.uniq.tab
@@ -196,7 +196,7 @@ Copy over your results folder and the Steps 1b and 1c notebooks to the shared la
 *Note: Save this notebook first so any results are recorded before copying.*
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/obitools-env
+source activate /users/${user}/.conda/envs/obitools-env
 
 destination=${data_path}/${project_code}/${mapped_folder}/${DIR}/${analysis_date}_${user}
 mkdir -p ${destination}
