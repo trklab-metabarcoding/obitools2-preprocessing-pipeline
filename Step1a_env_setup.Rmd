@@ -1,5 +1,6 @@
 ---
 title: "Step1a_environment_setup"
+subtitle: "Templating of folders and pipeline parameters."
 author: "T. Divoll"
 date: "2023-09-12"
 output: 

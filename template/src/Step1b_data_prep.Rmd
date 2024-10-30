@@ -1,5 +1,6 @@
 ---
 title: "Step 1b - data preparation"
+subtitle: "Run quality control checks on raw sequence data and trim primers from forward and reverse reads."
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
