@@ -110,7 +110,10 @@ cd ./results/id_data
 
 obiuniq -m sample *_id.fastq --without-progress-bar > all.uniq.fasta
 
-obicount all.uniq.fasta --without-progress-bar
+read number_of_asv total_sequences < <(obicount all.uniq.fasta --without-progress-bar)
+
+echo $number_of_asv
+echo $total_sequences
 ```
 
 #### Filter results to just `count` and `merged_sample` attributes in FASTA headers
