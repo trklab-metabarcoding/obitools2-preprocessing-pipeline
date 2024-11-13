@@ -1,5 +1,6 @@
 ---
 title: "Step 1b - data preparation"
+subtitle: "Run quality control checks on raw sequence data and trim primers from forward and reverse reads."
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
@@ -123,7 +124,7 @@ done
 ```{bash}
 conda init bash
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/cutadaptenv
+source activate /users/${user}/.conda/envs/cutadaptenv
 cd ./renamed_data
 
 for sample in $(cat sampleNames)
@@ -140,7 +141,7 @@ Now look at what fraction of reads were retained in each sample (column 2) and w
 
 ```{bash}
 source ~/.bash_profile
-conda activate /users/${user}/.conda/envs/cutadaptenv
+source activate /users/${user}/.conda/envs/cutadaptenv
 
 paste ./renamed_data/sampleNames <(grep "passing" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" ./results/cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") | column -t
 ```
@@ -149,7 +150,7 @@ Deactivate the conda environment that uses Python 3 for Cutadapt
 
 ```{bash}
 source ~/.bash_profile
-conda deactivate
+source deactivate
 ```
 
 Now navigate to the notebook `Step1c_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)

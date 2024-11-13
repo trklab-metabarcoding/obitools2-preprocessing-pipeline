@@ -1,5 +1,6 @@
 ---
 title: "Step1a_environment_setup"
+subtitle: "Templating of folders and pipeline parameters."
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
@@ -14,8 +15,8 @@ params:
     data_path: "/oscar/data/tkartzin/projects"
   
     #do change params below this line as needed
-    sample_sheet: "sample_sheet_URI_20231213.xlsx"
-    project_code: "FJ"
+    sample_sheet: "sample_sheet.xlsx"
+    project_code: "test"
 ---
 
 ### Environment Setup
