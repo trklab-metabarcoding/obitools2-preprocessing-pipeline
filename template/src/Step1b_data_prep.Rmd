@@ -150,7 +150,7 @@ Deactivate the conda environment that uses Python 3 for Cutadapt
 
 ```{bash}
 source ~/.bash_profile
-source deactivate
+conda deactivate
 ```
 
 Now navigate to the notebook `Step1c_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
