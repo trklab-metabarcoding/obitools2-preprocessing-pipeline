@@ -78,7 +78,12 @@ Before running step 1, you need to complete a sample sheet. In the parent direct
 
 ## Running the Notebooks for Step 1:
 
-**Note:** The first notebook (step_1a) is in the parent directory. Notebooks can be opened by double-clicking from the RStudio `Files` window.
+**Note:** The first notebook (Step_1a) is in the parent directory. Notebooks can be opened by double-clicking from the RStudio `Files` window.
+
+*Step_1a* should run very quickly.
+*Step_1b* should run within minutes as you walk through each code chunk.
+*Step_1c* takes the longest, particularly the chunk that pairs forward and reverse reads.
+The entire preprocessing pipeline should take a few hours (tested with 127 samples).
 
 ### Step 1a. `Step1a_env_setup.Rmd`
 The first step is to update all of the `params` in the YAML header of the first notebook. You can click "run all" from the drop-down menu at the top of the notebook to generate parameters and create environment variables.
