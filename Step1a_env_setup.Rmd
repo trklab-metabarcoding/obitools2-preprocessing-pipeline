@@ -51,6 +51,13 @@ sample_sheet <- sample_sheet %>%
 
 sample_sheet$SampleName <- as.character(sample_sheet$SampleName)
 sample_sheet$SampleID <- as.character(sample_sheet$SampleID)
+
+if (!all(str_detect(sample_sheet$SampleType, "control|sample"))) {
+  stop("Error: Some types are wrong; They should be either `control` or `sample` in lowercase.")
+} else {
+  message("All types look correctly formatted!")
+}
+
 ```
 
 The following dates are pulled from the sample sheet and can be used to filter out dates in case of contamination. The unique extraction, PCR, and sequencing dates are cast to lists that we can then index into later.

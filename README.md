@@ -71,7 +71,7 @@ Before running step 1, you need to complete a sample sheet. In the parent direct
 
 **Important notes on formats:**
 1. Dates should be in YYYYMMDD format (General or Text format in Excel).
-2. Make sure any controls are labeled as simply "control" in the SampleType column.
+2. Make sure any controls are labeled as simply "control" and sample are just "sample" in the SampleType column.
 
 **Note:** While we run pre-processing steps on individual sequencing runs, multiple sequencing runs can be processed at the same time, so it's important to include the folder name of where the sequencing data can be found in your sample sheet. 
 
