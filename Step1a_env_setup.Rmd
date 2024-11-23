@@ -4,7 +4,7 @@ subtitle: "Templating of folders and pipeline parameters."
 author: "T. Divoll"
 date: "2023-09-12"
 output: 
-  html_document:
+  html_notebook:
   keep_md: TRUE
   df_print: paged
   toc: true
@@ -102,4 +102,5 @@ file.copy(from=here(params$sample_sheet), to=here(work_dir))
 
 # copy out to the project folder on the shared lab drive
 file.copy(from=here(params$sample_sheet), to=paste(params$data_path, params$project_code))
+file.copy(from=here("Step1a_env_setup.nb.html"), to=paste(params$data_path, params$project_code))
 ```
