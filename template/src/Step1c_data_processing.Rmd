@@ -4,7 +4,7 @@ subtitle: "Merge forward and reverse reads, dereplicate sequence reads across sa
 author: "T. Divoll & B.Littleford-Colquhoun"
 date: "2024-10-29"
 output: 
-  html_document:
+  html_notebook:
   df_print: paged
   toc: true
 params:
@@ -204,7 +204,7 @@ mkdir -p ${destination}
 cp -r ./results/id_data ${destination}
 cp -r ./results/bad_controls_path ${destination}
 cp -r ./renamed_data ${destination}
-cp *.Rmd ${destination}
+cp *.nb.html ${destination}
 cp ./results/cutadapt_primer_trimming_stats.txt ${destination}
 
 conda deactivate
