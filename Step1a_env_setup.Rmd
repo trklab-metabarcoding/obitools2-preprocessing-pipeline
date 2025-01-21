@@ -5,24 +5,23 @@ author: "T. Divoll"
 date: "2023-09-12"
 output: 
   html_notebook:
-  keep_md: TRUE
   df_print: paged
   toc: true
 params:
-    #don't change these
-    datetime: !r (format(Sys.time(), "%Y%m%dT%H:%M:%SZ"))
-    user: !r Sys.getenv("LOGNAME")
-    data_path: "/oscar/data/tkartzin/projects"
+  #don't change these
+  datetime: !r (format(Sys.time(), '%Y%m%dT%H:%M:%SZ'))
+  user: !r Sys.getenv('LOGNAME')
+  data_path: "/oscar/data/tkartzin/projects"
   
-    #do change params below this line as needed
-    sample_sheet: "sample_sheet.xlsx"
-    project_code: "test"
+  #do change params below this line as needed
+  sample_sheet: "sample_sheet.xlsx"
+  project_code: "test"
 ---
 
 ### Environment Setup
 ```{r include=FALSE}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate, fs)
+pacman::p_load(knitr, here, tidyr, dplyr, readxl, stringr, spgs, filesstrings, lubridate, fs, rlang, rmarkdown)
 here::i_am("./Step1a_env_setup.Rmd")
 ```
 
@@ -99,8 +98,4 @@ for (m in seq_along(folders)){
 }
 
 file.copy(from=here(params$sample_sheet), to=here(work_dir))
-
-# copy out to the project folder on the shared lab drive
-file.copy(from=here(params$sample_sheet), to=paste(params$data_path, params$project_code))
-file.copy(from=here("Step1a_env_setup.nb.html"), to=paste(params$data_path, params$project_code))
 ```

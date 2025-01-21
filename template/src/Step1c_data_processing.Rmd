@@ -174,6 +174,7 @@ Add all of the `*id.fastq` files you want to move to the list named `bad_samples
 bad_samples_to_move <- here("results/id_data", c("", ""))
 ```
 
+*NOTE:* You will see an error message when line 180 runs if you don't have any bad samples to move. This can be ignored.
 ```{r}
 move_files(control_files, here("results/bad_controls_path"), overwrite = FALSE)
 move_files(bad_samples_to_move, here("results/bad_controls_path"), overwrite = FALSE)
