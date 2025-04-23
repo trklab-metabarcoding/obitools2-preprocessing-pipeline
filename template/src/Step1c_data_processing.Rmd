@@ -190,6 +190,11 @@ Sys.setenv(mapped_folder=mapped_folder)
 Sys.setenv(analysis_date=params$todaydate)
 ```
 
+### Print parameters for reporting
+```{r}
+params 
+```
+
 Copy over your results folder and the Steps 1b and 1c notebooks to the shared lab directory on Oscar.
 **Note: Save this notebook first so any results are recorded before copying.**
 ```{bash}

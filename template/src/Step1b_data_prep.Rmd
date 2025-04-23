@@ -152,4 +152,9 @@ source ~/.bash_profile
 conda deactivate
 ```
 
+### Print parameters for reporting
+```{r}
+params 
+```
+
 Now navigate to the notebook `Step1c_data_processing.Rmd` in the Files window pane. All of the variables and parameters should still be available in the R environment (see the `Environment` window pane.)
