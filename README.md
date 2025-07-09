@@ -1,6 +1,6 @@
 # obitools2-preprocessing-pipeline
 
-This repository contains the code for pre-processing metabarcoding data with OBITools v.1.2.12 on Brown's high-performance cluster, OSCAR. 
+This repository contains the code for pre-processing metabarcoding data with OBITools v.1.2.12 on Brown's high-performance cluster (HPC), OSCAR via an RStudio Server. The code could be adapted to run on other HPCs or RStudio Servers.
 
 **Note:** Pre-processing steps are run on individual sequencing runs to ensure that we can check "samples" and "controls" for contamination on a run-by-run basis. 
 
